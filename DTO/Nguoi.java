@@ -1,20 +1,20 @@
 package DTO;
 
-public class khachHang {
+public class Nguoi {
     private int id;
     private String name;
     private int age;
     private String numberPhone;
     private String email;
     private String status;
-    public khachHang(String name, int age, String numberPhone, String email, String status) {
+    public Nguoi(String name, int age, String numberPhone, String email, String status) {
         this.name = name;
         this.age = age;
         this.numberPhone = numberPhone;
         this.email = email;
         this.status = status;
     }
-    public khachHang(int id,String name, int age, String numberPhone, String email, String status) {
+    public Nguoi(int id,String name, int age, String numberPhone, String email, String status) {
         this.id = id;
         this.name = name;
         this.age = age;

@@ -6,6 +6,15 @@ public class Phim {
     private String type;
     private String duration;
     private String name_room;
+    private String url ;
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
 
     public Phim(){}
 
@@ -15,6 +24,12 @@ public class Phim {
         this.type = type;
         this.duration = duration;
         this.name_room = name_room;
+    }
+    public Phim(String name,String type,String duration,String url){
+        this.name = name;
+        this.type = type;
+        this.duration = duration;
+        this.url = url;
     }
 
     public int getId() {

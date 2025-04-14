@@ -11,6 +11,22 @@ public class LichChieu {
     private int id_phong;
     private LocalDate tg;
     private LocalTime time;
+    private String movieName ;
+    private String roomName;
+    public String getRoomName() {
+        return roomName;
+    }
+    public void setRoomName(String roomName) {
+        this.roomName = roomName;
+    }
+    public String getMovieName() {
+        return movieName;
+    }
+    public void setMovieName(String movieName) {
+        this.movieName = movieName;
+    }
+
+   
     Scanner sc = new Scanner(System.in);
     public LichChieu()
     {

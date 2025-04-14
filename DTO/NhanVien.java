@@ -1,6 +1,6 @@
 package DTO;
 
-public class NhanVien extends khachHang {
+public class NhanVien extends Nguoi {
     private String position;
     public String getPosition() {
         return position;

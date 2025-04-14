@@ -1,5 +1,6 @@
 package DAO;
 
+import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -13,10 +14,26 @@ public class DAOGheNgoi implements DAOInterFace<gheNgoi> {
     public static DAOGheNgoi getInstance(){
         return new DAOGheNgoi();
     }
+    public boolean examId_Room(int id){
+        String sql = "SELECT * FROM PhongChieu WHERE id = ?";
+        try(Connection con = duLieu.ket_noi()) {
+            PreparedStatement ptm = con.prepareStatement(sql);
+            ptm.setInt(1, id);
+            ResultSet rs = ptm.executeQuery();
+            return rs.next();
 
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return false;
+        }
+        finally{
+            duLieu.close();
+        }
+    }
     @Override
-    public void insert(gheNgoi t) {
+    public boolean insert(gheNgoi t) {
         String sql="INSERT INTO gheNgoi(room_id , seatNumber,status) VALUES  (?,?,?) ";
+
         try(Connection con  = duLieu.ket_noi()) {
             PreparedStatement ptm = con.prepareStatement(sql);
             ptm.setInt(1, t.getRoom_id());
@@ -24,86 +41,89 @@ public class DAOGheNgoi implements DAOInterFace<gheNgoi> {
             ptm.setString(3, t.getStatus());
             int i = ptm.executeUpdate();
             if(i>0){
-                System.out.println("Thêm ghế ngồi thành công");
-            }else{ 
-                System.out.println("thêm ghế ngồi thất bại");
-            }
+                return true;
+            }else return false;
         } catch (Exception e) {
             System.out.println(e.getMessage());
+            return false;
         }
     }
 
     @Override
-    public void delete(gheNgoi t) {
-         String sql = "DELETE FROM gheNgoi WHERE id = ?";
+    public  boolean delete(gheNgoi t) {
 
-        try (Connection conn = duLieu.ket_noi();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {  
-            pstmt.setInt(1, t.getId()); 
-            
-            int rowsInserted = pstmt.executeUpdate();
-            if (rowsInserted > 0) {
-                System.out.println("xóa ghế ngồi thành công thành công!");
-            }
+        try (Connection conn = duLieu.ket_noi()){
+             CallableStatement cal = conn.prepareCall("{CALL deleteGheNgoi(?,?)}");
+            cal.setInt(1, t.getId());
+            cal.registerOutParameter(2, java.sql.Types.NVARCHAR); 
+            cal.execute();   
+            // nếu xóa thành công trả về true ngược lại trả về false
+            return cal.getString(2).equalsIgnoreCase("xóa ghế ngồi thành công") ? true : false;    
     
         } catch (SQLException e) {
             e.printStackTrace();
+            return false;
+        }
+        finally{
+            duLieu.close();
         }
     }
 
     @Override
-    public void update(gheNgoi t) {
-        String sql = "UPDATE gheNgoi SET id = ?,room_id=?, seatNumber=?, status=? WHERE id = ?";
-
+    public boolean update(gheNgoi t) {
+        String sql = "UPDATE gheNgoi SET room_id=?, seatNumber=?, status=? WHERE id = ?";
         try (Connection conn = duLieu.ket_noi();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {                
-                pstmt.setInt(1, t.getId());
-                pstmt.setInt(2, t.getRoom_id());
-                pstmt.setString(3, t.getNumber_seat());
-                pstmt.setString(4, t.getStatus()); 
-                pstmt.setInt(5, t.getId());
-            
-            int rowsInserted = pstmt.executeUpdate();
-            if (rowsInserted > 0) {
-                System.out.println("xóa ghế ngồi thành công!");
-            }
+             PreparedStatement ptm = conn.prepareStatement(sql)) {                
+                    ptm.setInt(1, t.getRoom_id());
+                    ptm.setString(2, t.getNumber_seat());
+                    ptm.setString(3, t.getStatus()); 
+                    ptm.setInt(4, t.getId());
+                return ptm.executeUpdate()>0?true:false;
     
         } catch (SQLException e) {
             e.printStackTrace();
+            return false;
+        }
+        finally{
+            duLieu.close();
         }
     }
 
     @Override
-    public void selectAll(ArrayList<gheNgoi> ds) {
+    public ArrayList<gheNgoi> selectAll() {
+        ArrayList<gheNgoi> ds = new ArrayList<>();
         String sql = "SELECT * FROM gheNgoi ";
         try(Connection con = duLieu.ket_noi()) {
             PreparedStatement ptm = con.prepareStatement(sql);
             ResultSet rs = ptm.executeQuery();
-            if(rs==null){ System.out.println("không có dữ liệu"); return;}
             while(rs.next()) {
                 int id = rs.getInt("id");
                 int room_id = rs.getInt("room_id");
                 String name = rs.getString("seatNumber");
                 String status = rs.getString("status");
                 gheNgoi g = new gheNgoi(id,room_id, name, status);
-                ds.add(g);
-                g.inThongTin();
-                
+                ds.add(g);   
             }
+            return ds;
             
         } catch (Exception e) {
             System.out.println(e.getMessage());
+            return null;
+        }
+        finally{
+            duLieu.close();
         }
     }
 
     @Override
-    public void selectCondition(ArrayList<gheNgoi> ds, String condition) {
+    public ArrayList<gheNgoi> selectCondition( String condition) {
+        ArrayList<gheNgoi> ds = new ArrayList<>();
         String sql = "SELECT * FROM gheNgoi " +
-        "WHERE " + condition;
+        "WHERE seatNumber LIKE ? ";
         try(Connection con = duLieu.ket_noi()) {
             PreparedStatement ptm = con.prepareStatement(sql);
+            ptm.setString(1,"%"+condition+"%");
             ResultSet rs = ptm.executeQuery();
-            if(rs==null){ System.out.println("không có dữ liệu"); return;}
             while(rs.next()) {
                 int id = rs.getInt("id");
                 int room_id = rs.getInt("room_id");
@@ -111,12 +131,15 @@ public class DAOGheNgoi implements DAOInterFace<gheNgoi> {
                 String status = rs.getString("status");
                 gheNgoi g = new gheNgoi(id,room_id, name, status);
                 ds.add(g);
-                g.inThongTin();
-                
             }
+            return ds;
             
         } catch (Exception e) {
             System.out.println(e.getMessage());
+            return null;
+        }
+        finally{
+            duLieu.close();
         }
     
     }

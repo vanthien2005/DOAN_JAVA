@@ -6,35 +6,14 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-
+import DTO.NhanVien;
 import DataBase.duLieu;
-import DTO.Nguoi;
 
-public class DAOKhachHang implements DAOInterFace<Nguoi> {
-    public static DAOKhachHang getInstance(){
-        return new DAOKhachHang();
-    }
-   
-    public boolean exam_id(int id){
-        String sql = "SELECT * FROM khachHang WHERE id = ?";
-        try(Connection con = duLieu.ket_noi()) {
-            PreparedStatement ptm = con.prepareStatement(sql);
-            ptm.setInt(1, id);
-            ResultSet rs = ptm.executeQuery();
-            return rs.next();
-            
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            return false;
-        }
-        finally{
-            duLieu.close();
-        }
-    }
+public class DAONhanVien implements DAOInterFace<NhanVien> {
 
     @Override
-    public boolean insert(Nguoi t) {
-        String sql = "INSERT INTO khachHang (id,name,age,numberPhone,email,status) VALUES (?,?,?,?,?,?)";
+    public boolean insert(NhanVien t) {
+         String sql = "INSERT INTO NhanVien (id,name,age,numberPhone,email,status,position) VALUES (?,?,?,?,?,?,?)";
         try(Connection conn = duLieu.ket_noi()) {
             PreparedStatement ptm = conn.prepareStatement(sql);
             ptm.setInt(1,t.getId());
@@ -43,6 +22,7 @@ public class DAOKhachHang implements DAOInterFace<Nguoi> {
             ptm.setString(4,t.getNumberPhone());
             ptm.setString(5, t.getEmail());
             ptm.setString(6, t.getStatus());
+            ptm.setString(7, t.getPosition());
             int row = ptm.executeUpdate();
             return row>0?true:false;
 
@@ -55,10 +35,9 @@ public class DAOKhachHang implements DAOInterFace<Nguoi> {
     }
 
     @Override
-    public boolean delete(Nguoi t) {
-
+    public boolean delete(NhanVien t) {
         try (Connection conn = duLieu.ket_noi()){
-            CallableStatement cal = conn.prepareCall("{CALL deleteKhachHang(?,?)}");
+            CallableStatement cal = conn.prepareCall("{CALL deleteNhanVien(?,?)}");
             cal.setInt(1, t.getId()); 
             cal.registerOutParameter(2, java.sql.Types.NVARCHAR);
             cal.execute();
@@ -74,8 +53,8 @@ public class DAOKhachHang implements DAOInterFace<Nguoi> {
     }
 
     @Override
-    public boolean update(Nguoi t) {
-        String sql = "UPDATE khachHang SET name = ?,age = ?, numberPhone=?, email=?, status=? WHERE id = ?";
+    public boolean update(NhanVien t) {
+        String sql = "UPDATE NhanVien SET name = ?,age = ?, numberPhone=?, email=?, status=?, position = ? WHERE id = ?";
 
         try (Connection conn = duLieu.ket_noi();
              PreparedStatement ptm = conn.prepareStatement(sql)) {                
@@ -84,7 +63,8 @@ public class DAOKhachHang implements DAOInterFace<Nguoi> {
                 ptm.setString(3, t.getNumberPhone());
                 ptm.setString(4, t.getEmail());
                 ptm.setString(5,t.getStatus());
-                ptm.setInt(6, t.getId());
+                ptm.setString(6, t.getPosition());
+                ptm.setInt(7, t.getId());
             
                 return ptm.executeUpdate()>0 ? true : false;
     
@@ -98,20 +78,20 @@ public class DAOKhachHang implements DAOInterFace<Nguoi> {
     }
 
     @Override
-    public ArrayList<Nguoi> selectAll() {
-        ArrayList<Nguoi> ds = new ArrayList<>();
-        String sql = "SELECT * FROM khachHang WHERE status = 'T'";
+    public ArrayList<NhanVien> selectAll() {
+         ArrayList<NhanVien> ds = new ArrayList<>();
+        String sql = "SELECT * FROM NhanVien WHERE status = 'T'";
         try(Connection con = duLieu.ket_noi()) {
             PreparedStatement ptm = con.prepareStatement(sql);
             ResultSet rs = ptm.executeQuery();
                 while (rs.next()) {
-                    int id = rs.getInt(1);
-                    String name = rs.getString(2);
-                    int age = rs.getInt(3);
-                    String numberPhone = rs.getString(4);
-                    String email = rs.getString(5);
-                    String status = rs.getString(6);
-                    Nguoi k = new Nguoi(id,name, age, numberPhone, email, status);
+                    int id = rs.getInt("id");
+                    String name = rs.getString("name");
+                    int age = rs.getInt("age");
+                    String numberPhone = rs.getString("numberPhone");
+                    String email = rs.getString("email");
+                    String status = rs.getString("status");
+                    NhanVien k = new NhanVien(id,name, age, numberPhone, email, status,rs.getString("position"));
                     ds.add(k);                  
                 }
                 return ds;
@@ -125,12 +105,11 @@ public class DAOKhachHang implements DAOInterFace<Nguoi> {
             duLieu.close();
         }
     }
-    
 
     @Override
-    public ArrayList<Nguoi>  selectCondition( String condition) {
-        ArrayList<Nguoi> ds = new ArrayList<>();
-        String sql = "SELECT * FROM khachHang WHERE status = 'T' AND name LIKE ? ";
+    public ArrayList<NhanVien> selectCondition(String condition) {
+        ArrayList<NhanVien> ds = new ArrayList<>();
+        String sql = "SELECT * FROM NhanVien WHERE name LIKE ?";
         try(Connection con = duLieu.ket_noi()) {
             PreparedStatement ptm = con.prepareStatement(sql);
             ptm.setString(1,"%"+condition+"%");
@@ -142,7 +121,7 @@ public class DAOKhachHang implements DAOInterFace<Nguoi> {
                     String numberPhone = rs.getString(4);
                     String email = rs.getString(5);
                     String status = rs.getString(6);
-                    Nguoi k = new Nguoi(id,name, age, numberPhone, email, status);
+                    NhanVien k = new NhanVien(id,name, age, numberPhone, email, status,rs.getString("position"));
                     ds.add(k);                  
                 }
                 return ds;
@@ -155,7 +134,6 @@ public class DAOKhachHang implements DAOInterFace<Nguoi> {
         finally{
             duLieu.close();
         }
-        
     }
     
 }

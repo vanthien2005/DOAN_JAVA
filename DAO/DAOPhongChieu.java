@@ -1,5 +1,6 @@
 package DAO;
 
+import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -14,70 +15,100 @@ public class DAOPhongChieu implements DAOInterFace<PhongChieu> {
         return new DAOPhongChieu();
     }
 
-    @Override
-    public void insert(PhongChieu t) {
-        String sql = "INSERT INTO PhongChieu (id,name, capacity) VALUES (?, ?, ?)";
+    public boolean examId_emp(int id){
+        String sql = "SELECT * FROM NhanVien WHERE id = ?";
+        try(Connection con = duLieu.ket_noi()) {
+            PreparedStatement ptm = con.prepareStatement(sql);
+            ptm.setInt(1, id);
+            ResultSet rs = ptm.executeQuery();
+            return rs.next();
 
-    try (Connection conn = duLieu.ket_noi();
-         PreparedStatement pstmt = conn.prepareStatement(sql)) {
-        
-        pstmt.setInt(1, t.getID()); 
-        pstmt.setString(2, t.getName());
-        pstmt.setInt(3, t.getSoGhe());
-        
-
-
-        int rowsInserted = pstmt.executeUpdate();
-        if (rowsInserted > 0) {
-            System.out.println("Thêm phòng chiếu thành công!");
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return false;
         }
+        finally{
+            duLieu.close();
+        }
+
+    }
+    public boolean examId(int id){
+        String sql = "SELECT * FROM PhongChieu WHERE id = ?";
+        try(Connection con = duLieu.ket_noi()) {
+            PreparedStatement ptm = con.prepareStatement(sql);
+            ptm.setInt(1, id);
+            ResultSet rs = ptm.executeQuery();
+            return rs.next();
+
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return false;
+        }
+        finally{
+            duLieu.close();
+        }
+    }
+
+    @Override
+    public boolean insert(PhongChieu t) {
+        String sql = "INSERT INTO PhongChieu (name, capacity,emp_id) VALUES (?, ?,?)";
+
+    try (Connection conn = duLieu.ket_noi()){
+        PreparedStatement ptm = conn.prepareStatement(sql);
+        
+        ptm.setString(1, t.getName());
+        ptm.setInt(2, t.getSoGhe());
+        ptm.setInt(3, t.getEmp_id());
+        return ptm.executeUpdate()>0 ? true : false;
 
     } catch (SQLException e) {
         System.out.println(e.getMessage());
+        return false;
+    }
+    finally{
+        duLieu.close();
     }
     }
 
     @Override
-    public void delete(PhongChieu t) {
-        String sql = "DELETE FROM PhongChieu WHERE id = ?";
+    public boolean delete(PhongChieu t) {
 
-    try (Connection conn = duLieu.ket_noi();
-         PreparedStatement pstmt = conn.prepareStatement(sql)) {  
-        pstmt.setInt(1, t.getID()); 
-        
-
-
-        int rowsInserted = pstmt.executeUpdate();
-        if (rowsInserted > 0) {
-            System.out.println("xóa phòng chiếu thành công!");
-        }
+    try (Connection conn = duLieu.ket_noi()){
+        CallableStatement cal  = conn.prepareCall("{CALL deletePhongChieu(?,?)}");
+        cal.setInt(1, t.getID());
+        cal.registerOutParameter(2, java.sql.Types.NVARCHAR);
+        cal.execute();
+        return cal.getString(2).equalsIgnoreCase("xóa thành công")? true : false;
 
     } catch (SQLException e) {
         e.printStackTrace();
+        return false;
+    }
+    finally{
+        duLieu.close();
     }
     }
 
     @Override
-    public void update(PhongChieu t) {
-        String sql = "UPDATE PhongChieu SET id=?,name=? ,capacity=?,  emp_id = ? WHERE id = ?";
+    public boolean update(PhongChieu t) {
+        String sql = "UPDATE PhongChieu SET name=? ,capacity=?,  emp_id = ? WHERE id = ?";
 
         try (Connection conn = duLieu.ket_noi();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {  
-                pstmt.setInt(1, t.getID());               
-                pstmt.setString(2, t.getName());
-                pstmt.setInt(3, t.getSoGhe()); 
-                pstmt.setInt(4, t.getEmp_id());
-                pstmt.setInt(5, t.getID());  
+             PreparedStatement ptm = conn.prepareStatement(sql)) {                
+                ptm.setString(1, t.getName());
+                ptm.setInt(2, t.getSoGhe()); 
+                ptm.setInt(3, t.getEmp_id());
+                ptm.setInt(4, t.getID());  
 
-            
-    
-            int rowsInserted = pstmt.executeUpdate();
-            if (rowsInserted > 0) {
-                System.out.println("Cập nhật phòng chiếu thành công!");
-            }
+             return ptm.executeUpdate()>0 ? true : false;
+           
     
         } catch (SQLException e) {
             e.printStackTrace();
+            return false;
+        }
+        finally{
+            duLieu.close();
         }
        
     }
@@ -85,17 +116,20 @@ public class DAOPhongChieu implements DAOInterFace<PhongChieu> {
 
 
     @Override
-    public void selectCondition( ArrayList<PhongChieu> ds,String condition) {
+    public ArrayList<PhongChieu> selectCondition( String condition) {
+        ArrayList<PhongChieu> ds = new ArrayList<>();
         String sql = "SELECT PhongChieu.id, PhongChieu.name, PhongChieu.capacity,PhongChieu.emp_id, Phim.name AS name_phim, NhanVien.name AS nameNhanVien " +
         "FROM PhongChieu " +
-        "INNER JOIN PhongChieuPhim ON PhongChieuPhim.room_id = PhongChieu.id " +
-        "INNER JOIN Phim ON Phim.id = PhongChieuPhim.movie_id " +
-        "INNER JOIN NhanVien ON NhanVien.id = PhongChieu.emp_id ";
+        "LEFT JOIN PhongChieuPhim ON PhongChieuPhim.room_id = PhongChieu.id " +
+        "LEFT JOIN Phim ON Phim.id = PhongChieuPhim.movie_id " +
+        "LEFT JOIN NhanVien ON NhanVien.id = PhongChieu.emp_id " +
+        "WHERE name LIKE ?";
         
         try(Connection con = duLieu.ket_noi()) {
             PreparedStatement ptm = con.prepareStatement(sql);
+            ptm.setString(1,"%"+condition+"%");
            ResultSet rs =  ptm.executeQuery();
-           if(rs!=null){
+           
             while (rs.next()) {
                 int id = rs.getInt("id");
                 String name = rs.getString("name");
@@ -103,25 +137,25 @@ public class DAOPhongChieu implements DAOInterFace<PhongChieu> {
                 String name_phim = rs.getString("name_phim");
                 int emp_id = rs.getInt("emp_id");
                 PhongChieu p = new PhongChieu(id,name,sucChua,name_phim,emp_id);
+                p.setEmpName(rs.getString("nameNhanVien"));
                 ds.add(p);
-                p.inThongTin();
-                System.out.println("Nhân viên phụ trách: "+rs.getString("nameNhanVien"));
-                
+                              
             }
-            
-           } else System.out.println("không có dữ liệu");
-
+            return ds;
             
         } catch (Exception e) {
             System.out.println(e.getMessage());
+            return null;
         }
-
-        
+        finally{
+            duLieu.close();
+        }
     }
     
 
     @Override
-    public void selectAll(ArrayList<PhongChieu> ds) {
+    public ArrayList<PhongChieu> selectAll() {
+        ArrayList<PhongChieu> ds = new ArrayList<>();
         String sql = "SELECT PhongChieu.id, PhongChieu.name, PhongChieu.capacity,PhongChieu.emp_id, Phim.name AS name_phim, NhanVien.name AS nameNhanVien " +
         "FROM PhongChieu " +
         "INNER JOIN PhongChieuPhim ON PhongChieuPhim.room_id = PhongChieu.id " +
@@ -131,7 +165,6 @@ public class DAOPhongChieu implements DAOInterFace<PhongChieu> {
         try(Connection con = duLieu.ket_noi()) {
             PreparedStatement ptm = con.prepareStatement(sql);
            ResultSet rs =  ptm.executeQuery();
-           if(rs!=null){
             while (rs.next()) {
                 int id = rs.getInt("id");
                 String name = rs.getString("name");
@@ -139,21 +172,19 @@ public class DAOPhongChieu implements DAOInterFace<PhongChieu> {
                 String name_phim = rs.getString("name_phim");
                 int emp_id = rs.getInt("emp_id");
                 PhongChieu p = new PhongChieu(id,name,sucChua,name_phim,emp_id);
+                p.setEmpName(rs.getString("nameNhanVien"));
                 ds.add(p);
-                p.inThongTin();
-                System.out.println("Nhân viên phụ trách: "+rs.getString("nameNhanVien"));
-                System.out.println("-----------------------------------");
-                
             }
-            
-           } else System.out.println("không có dữ liệu");
-
+            return ds;
             
         } catch (Exception e) {
             System.out.println(e.getMessage());
+            return null;
+        }
+        finally{
+            duLieu.close();
         }
 
-        
     }
 }
     

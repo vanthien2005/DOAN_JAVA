@@ -22,5 +22,13 @@ public class duLieu {
         }
         return conn;
     }
+    public static void close(){
+       try(Connection con= ket_noi()) {
+       con.close();
+        
+       } catch (Exception e) {
+        System.out.println(e.getMessage());
+       }
+    }
 
 }

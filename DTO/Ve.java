@@ -1,5 +1,8 @@
 package DTO;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+
 public class Ve {
     private int id;
     private int user_id;
@@ -7,6 +10,52 @@ public class Ve {
     private int showTime_id;
     private String status;
     private int price;
+    private String nameUser;
+    private String nameSeat;
+    private LocalTime time;
+    private String nameRoom;
+    private LocalDate day;
+    private String nameMovie;
+    public String getNameMovie() {
+        return nameMovie;
+    }
+    public void setNameMovie(String nameMovie) {
+        this.nameMovie = nameMovie;
+    }
+    public LocalDate getDay() {
+        return day;
+    }
+    public void setDay(LocalDate day) {
+        this.day = day;
+    }
+    public String getNameRoom() {
+        return nameRoom;
+    }
+    public void setNameRoom(String nameRoom) {
+        this.nameRoom = nameRoom;
+    }
+    public LocalTime getTime() {
+        return time;
+    }
+    public void setTime(LocalTime time) {
+        this.time = time;
+    }
+    public String getNameSeat() {
+        return nameSeat;
+    }
+    public void setNameSeat(String nameSeat) {
+        this.nameSeat = nameSeat;
+    }
+
+    public String getNameUser() {
+        return nameUser;
+    }
+    public void setNameUser(String nameUser) {
+        this.nameUser = nameUser;
+    }
+
+   
+
     
     public Ve(int id,int price){
         this.id = id;
