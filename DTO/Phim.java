@@ -7,6 +7,15 @@ public class Phim {
     private String duration;
     private String name_room;
     private String url ;
+    private int status;
+
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
+    }
 
     public String getUrl() {
         return url;
@@ -62,14 +71,6 @@ public class Phim {
 
     public void setDuration(String duration) {
         this.duration = duration;
-    }
-    public void inThongTin(){
-        System.out.println("ID phim: "+id);
-        System.out.println("Tên phim: "+name);
-        System.out.println("Thể loại: "+type);
-        System.err.println("Thời lượng: "+duration);
-        System.out.println("Phòng chiếu: "+name_room);
-        System.out.println("------------------------------------------");
     }
 
 }

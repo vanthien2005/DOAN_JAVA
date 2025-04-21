@@ -22,6 +22,9 @@ public class Nguoi {
         this.email = email;
         this.status = status;
     }
+    public Nguoi() {
+        //TODO Auto-generated constructor stub
+    }
     public int getId() {
         return id;
     }

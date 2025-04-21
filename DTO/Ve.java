@@ -12,6 +12,28 @@ public class Ve {
     private int price;
     private String nameUser;
     private String nameSeat;
+    private LocalDate ngay;
+    private int total;
+    private String numberPhone;
+    public String getNumberPhone() {
+        return numberPhone;
+    }
+    public void setNumberPhone(String numberPhone) {
+        this.numberPhone = numberPhone;
+    }
+    public int getTotal() {
+        return total;
+    }
+    public void setTotal(int total) {
+        this.total = total;
+    }
+    public LocalDate getNgay() {
+        return ngay;
+    }
+    public void setNgay(LocalDate ngay) {
+        this.ngay = ngay;
+    }
+
     private LocalTime time;
     private String nameRoom;
     private LocalDate day;
@@ -55,8 +77,6 @@ public class Ve {
     }
 
    
-
-    
     public Ve(int id,int price){
         this.id = id;
         this.price = price;
@@ -84,6 +104,9 @@ public class Ve {
     }
     
 
+    public Ve() {
+        //TODO Auto-generated constructor stub
+    }
     public int getId() {
         return id;
     }

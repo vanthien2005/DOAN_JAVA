@@ -6,6 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.sql.Statement;
 
 import DataBase.duLieu;
 import DTO.Nguoi;
@@ -34,15 +35,14 @@ public class DAOKhachHang implements DAOInterFace<Nguoi> {
 
     @Override
     public boolean insert(Nguoi t) {
-        String sql = "INSERT INTO khachHang (id,name,age,numberPhone,email,status) VALUES (?,?,?,?,?,?)";
+        String sql = "INSERT INTO khachHang (name,age,numberPhone,email,status) VALUES (?,?,?,?,?)";
         try(Connection conn = duLieu.ket_noi()) {
             PreparedStatement ptm = conn.prepareStatement(sql);
-            ptm.setInt(1,t.getId());
-            ptm.setString(2, t.getName());
-            ptm.setInt(3, t.getAge());
-            ptm.setString(4,t.getNumberPhone());
-            ptm.setString(5, t.getEmail());
-            ptm.setString(6, t.getStatus());
+            ptm.setString(1, t.getName());
+            ptm.setInt(2, t.getAge());
+            ptm.setString(3,t.getNumberPhone());
+            ptm.setString(4, t.getEmail());
+            ptm.setString(5, t.getStatus());
             int row = ptm.executeUpdate();
             return row>0?true:false;
 
@@ -53,6 +53,31 @@ public class DAOKhachHang implements DAOInterFace<Nguoi> {
             duLieu.close();
         }
     }
+
+    public int insertAndGetId(Nguoi n) {
+        String sql = "INSERT INTO khachHang (name, numberPhone) VALUES (?, ?)";
+        try (Connection conn = duLieu.ket_noi()) {
+            PreparedStatement ptm = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            ptm.setString(1, n.getName());
+            ptm.setString(2, n.getNumberPhone());
+            int affectedRows = ptm.executeUpdate();
+    
+            if (affectedRows == 0) {
+                throw new SQLException("Creating user failed, no rows affected.");
+            }
+            try (ResultSet generatedKeys = ptm.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    return generatedKeys.getInt(1); // ID vừa được tạo
+                } else {
+                    throw new SQLException("Creating user failed, no ID obtained.");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return -1;
+        }
+    }
+    
 
     @Override
     public boolean delete(Nguoi t) {

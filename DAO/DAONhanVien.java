@@ -11,6 +11,24 @@ import DataBase.duLieu;
 
 public class DAONhanVien implements DAOInterFace<NhanVien> {
 
+    public boolean examId(int id){
+        String sql = "SELECT * FROM NhanVien WHERE id = ?";
+        try(Connection con = duLieu.ket_noi()) {
+            PreparedStatement ptm = con.prepareStatement(sql);
+            ptm.setInt(1, id);
+            ResultSet rs = ptm.executeQuery();
+            return rs.next();
+
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return false;
+        }
+        finally{
+            duLieu.close();
+        }
+
+    }
+
     @Override
     public boolean insert(NhanVien t) {
          String sql = "INSERT INTO NhanVien (id,name,age,numberPhone,email,status,position) VALUES (?,?,?,?,?,?,?)";

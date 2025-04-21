@@ -4,41 +4,99 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 
 import DataBase.duLieu;
-import DTO.PhongChieuPhim;
+import DTO.HoaDon;
+import DTO.LichChieu;
+import DTO.Nguoi;
+import DTO.Phim;
 import DTO.Ve;
+import DTO.gheNgoi;
 
 public class DAOVe implements DAOInterFace<Ve> {
+    DAOKhachHang d = new DAOKhachHang();
     public static DAOVe getInstance(){
         return new DAOVe();
     }
-    public boolean examId_User(int id){
-        String sql = "SELECT * FROM khachHang  WHERE id = ?";
+
+    public ArrayList<gheNgoi>dsGheNgoi(int id){
+        ArrayList<gheNgoi> ds = new ArrayList<>();
+        String sql = "SELECT Seat.name,Seat.id " + 
+                        "FROM Seat " + 
+                        "WHERE Seat.id NOT IN ( " + 
+                        "    SELECT Ve.seat_id " + 
+                        "    FROM Ve " + 
+                        "    WHERE Ve.showTime_id = ? " +
+                        ")" ;
         try(Connection con = duLieu.ket_noi()) {
             PreparedStatement ptm = con.prepareStatement(sql);
-            ptm.setInt(1, id);
+            ptm.setInt(1,id);
             ResultSet rs = ptm.executeQuery();
-            return rs.next();
+            while (rs.next()) {
+                gheNgoi g = new gheNgoi();
+                g.setId(rs.getInt("id"));
+                g.setNumber_seat(rs.getString("name"));
+                ds.add(g);
+                
+            }
+            return ds;
+   
         } catch (Exception e) {
-            return false;
+            System.out.println(e.getMessage());
+            return null;
         }
-    }
-    public boolean examId_seat(int id){
-        String sql = "SELECT * FROM gheNgoi WHERE id = ?";
-        try(Connection con = duLieu.ket_noi()) {
-            PreparedStatement ptm = con.prepareStatement(sql);
-            ptm.setInt(1, id);
-            ResultSet rs = ptm.executeQuery();
-            return rs.next();
-        } catch (Exception e) {
-            return false;
-        }
+
     }
 
+    public ArrayList<Phim> dsPhim(){
+        ArrayList<Phim>ds = new ArrayList<>();
+        String sql = "SELECT * FROM PHIM WHERE status = 1 ";
+        try(Connection con = duLieu.ket_noi()) {
+            PreparedStatement ptm = con.prepareStatement(sql);
+            ResultSet rs = ptm.executeQuery();
+            while (rs.next()) {
+                Phim p = new Phim();
+                p.setId(rs.getInt("id"));
+                p.setName(rs.getString("name"));
+                ds.add(p);   
+            }
+            return ds;
+            
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return null;
+        }
+    }
+    public ArrayList<LichChieu>dsLichChieu(int id){
+        String sql = "SELECT LichChieu.id,LichChieu.date,LichChieu.time,PhongChieu.name " + 
+        "FROM LichChieu " +
+        "JOIN PhongChieu ON PhongChieu.id = LichChieu.room_id " +
+        "WHERE movie_id = ? ";
+        ArrayList<LichChieu>ds = new ArrayList<>();
+        try(Connection con = duLieu.ket_noi()) {
+            PreparedStatement ptm = con.prepareStatement(sql);
+            ptm.setInt(1, id);
+            ResultSet rs = ptm.executeQuery();
+            while (rs.next()) {
+                LichChieu l = new LichChieu();
+                l.setID(rs.getInt("id"));
+                l.setTg(rs.getDate("date").toLocalDate());
+                l.setTime(rs.getTime("time").toLocalTime());
+                l.setRoomName(rs.getString("name"));
+                ds.add(l);
+            }
+            return ds;
+        } catch (Exception e) {
+            System.err.println(e.getMessage());
+            return null;
+           
+        }
+    }
+    
     public boolean examId_showTime(int id){
         String sql = "SELECT * FROM LichChieu WHERE id = ?";
         try(Connection con = duLieu.ket_noi()) {
@@ -52,16 +110,20 @@ public class DAOVe implements DAOInterFace<Ve> {
     }
     @Override
     public boolean insert(Ve t) {
-           String sql = "INSERT INTO Ve (user_id, seat_id,showTime_id,status,price) VALUES (?, ?, ?,?,?)";
+        Nguoi n = new Nguoi();
+        n.setName(t.getNameUser());
+        n.setNumberPhone(t.getNumberPhone());
+        int idKhachHang = d.insertAndGetId(n);
 
-    try (Connection conn = duLieu.ket_noi()){
-        PreparedStatement ptm = conn.prepareStatement(sql);
-        ptm.setInt(1, t.getUser_id()); 
-        ptm.setInt(2, t.getSeat_id());
-        ptm.setInt(3, t.getShowTime_id());
-        ptm.setString(4, t.getStatus());
-        ptm.setInt(5, t.getPrice());
-        return ptm.executeUpdate()>0? true : false;
+        String sql = "INSERT INTO Ve (user_id, seat_id,showTime_id,status,price) VALUES (?, ?, ?,?,?)";
+        try (Connection conn = duLieu.ket_noi()) {
+            PreparedStatement ptm = conn.prepareStatement(sql);
+            ptm.setInt(1, idKhachHang); 
+            ptm.setInt(2, t.getSeat_id());
+            ptm.setInt(3, t.getShowTime_id());
+            ptm.setString(4, t.getStatus());
+            ptm.setInt(5, t.getPrice());
+            return ptm.executeUpdate()>0;
 
     } catch (SQLException e) {
         System.out.println(e.getMessage());
@@ -71,12 +133,11 @@ public class DAOVe implements DAOInterFace<Ve> {
 
     @Override
     public boolean delete(Ve t) {
-        String sql = "DELETE FROM Ve WHERE id = ?";
+        String sql = "UPDATE Ve SET status = N'Đã hủy' WHERE id = ?";
         try (Connection conn = duLieu.ket_noi();
              PreparedStatement ptm = conn.prepareStatement(sql)) {  
-            ptm.setInt(1, t.getId()); 
-            
-            return ptm.executeUpdate()>0 ? true : false;
+            ptm.setInt(1, t.getId());
+            return ptm.executeUpdate()>0 ;
     
         } catch (SQLException e) {
             e.printStackTrace();
@@ -86,22 +147,15 @@ public class DAOVe implements DAOInterFace<Ve> {
 
     @Override
     public boolean update(Ve t) {
-        String sql = "UPDATE Ve SET user_id = ?,seat_id = ?, showTime_id=?, status=?, price=? WHERE id = ?";
-
+        String sql = "UPDATE Ve SET status=?  WHERE id = ?";
         try (Connection conn = duLieu.ket_noi();
              PreparedStatement ptm = conn.prepareStatement(sql)) {                
-                ptm.setInt(1, t.getUser_id());
-                ptm.setInt(2, t.getSeat_id()); 
-                ptm.setInt(3, t.getShowTime_id());
-                ptm.setString(4, t.getStatus());
-                ptm.setInt(5,t.getPrice());
-                ptm.setInt(6, t.getId());
-                
-                return ptm.executeUpdate()>0 ? true : false;
-          
+                ptm.setString(1, t.getStatus());
+                ptm.setInt(2, t.getId());
+                return ptm.executeUpdate()> 0 ;
     
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println(e.getMessage());
             return false;
         }
     }
@@ -109,13 +163,13 @@ public class DAOVe implements DAOInterFace<Ve> {
     @Override
     public ArrayList<Ve> selectAll() {
         ArrayList<Ve> ds = new ArrayList<>();
-        String sql = "SELECT Ve.id, Ve.user_id, Ve.seat_id, Ve.showTime_id, Ve.status , Ve.price ,LichChieu.room_id, LichChieu.movie_id, Phim.name AS nameMovie, LichChieu.time AS timeChieu,LichChieu.date AS dayChieu,gheNgoi.seatNumber AS nameNumber, khachHang.name AS nameUser, khachHang.numberPhone AS numUser, PhongChieu.name AS roomName " +
+        String sql = "SELECT Ve.id, Ve.user_id, Ve.seat_id, Ve.showTime_id, Ve.status , Ve.price ,LichChieu.room_id, LichChieu.movie_id, Phim.name AS nameMovie, LichChieu.time AS timeChieu,LichChieu.date AS dayChieu,Seat.name AS nameNumber, khachHang.name AS nameUser, khachHang.numberPhone AS numUser, PhongChieu.name AS roomName " +
         "FROM Ve " +
-        "INNER JOIN khachHang  ON khachHang.id = Ve.user_id " +
-        "INNER JOIN LichChieu ON LichChieu.id = Ve.showTime_id " +
-        "INNER JOIN PhongChieu ON PhongChieu.id = LichChieu.room_id " +
-        "INNER JOIN Phim ON Phim.id = LichChieu.movie_id " +
-        "INNER JOIN gheNgoi ON gheNgoi.id = Ve.seat_id ";
+        "JOIN khachHang  ON khachHang.id = Ve.user_id " +
+        "JOIN LichChieu ON LichChieu.id = Ve.showTime_id " +
+        "JOIN PhongChieu ON PhongChieu.id = LichChieu.room_id " +
+        "JOIN Phim ON Phim.id = LichChieu.movie_id " +
+        "JOIN Seat ON Seat.id = Ve.seat_id ";
         try(Connection conn = duLieu.ket_noi()) {
         PreparedStatement ptm = conn.prepareStatement(sql);
         ResultSet rs = ptm.executeQuery();
@@ -142,16 +196,16 @@ public class DAOVe implements DAOInterFace<Ve> {
             }
 
     @Override
-    public ArrayList<Ve> selectCondition( String condition) {
+    public ArrayList<Ve> selectCondition(String condition) {
         ArrayList<Ve> ds = new ArrayList<>();
-        String sql = "SELECT Ve.id, Ve.user_id, Ve.seat_id, Ve.showTime_id, Ve.status , Ve.price ,LichChieu.room_id, LichChieu.movie_id, Phim.name AS nameMovie, LichChieu.time AS timeChieu,gheNgoi.seatNumber AS nameNumber, khachHang.name AS nameUser, khachHang.numberPhone AS numUser, PhongChieu.name AS roomName " +
+        String sql = "SELECT Ve.id, Ve.user_id, Ve.seat_id, Ve.showTime_id, Ve.status , Ve.price ,LichChieu.room_id, LichChieu.movie_id, Phim.name AS nameMovie, LichChieu.time AS timeChieu, LichChieu.date AS dayChieu,gheNgoi.seatNumber AS nameNumber, khachHang.name AS nameUser, khachHang.numberPhone AS numUser, PhongChieu.name AS roomName " +
         "FROM Ve " +
-        "INNER JOIN khachHang  ON khachHang.id = Ve.user_id " +
-        "INNER JOIN LichChieu ON LichChieu.id = Ve.showTime_id " +
-        "INNER JOIN PhongChieu ON PhongChieu.id = LichChieu.room_id " +
-        "INNER JOIN Phim ON Phim.id = LichChieu.movie_id " +
-        "INNER JOIN gheNgoi ON gheNgoi.id = Ve.seat_id " +
-        "WHERE status LIKE ? " ;
+        "JOIN khachHang  ON khachHang.id = Ve.user_id " +
+        "JOIN LichChieu ON LichChieu.id = Ve.showTime_id " +
+        "JOIN PhongChieu ON PhongChieu.id = LichChieu.room_id " +
+        "JOIN Phim ON Phim.id = LichChieu.movie_id " +
+        "JOIN gheNgoi ON gheNgoi.id = Ve.seat_id " +
+        "WHERE Ve.status LIKE ?" ;
         try(Connection conn = duLieu.ket_noi()) {
         PreparedStatement ptm = conn.prepareStatement(sql);
         ptm.setString(1, "%"+condition+"%");
@@ -177,6 +231,5 @@ public class DAOVe implements DAOInterFace<Ve> {
         return null;
     }
     }
-  
-    
+   
 }

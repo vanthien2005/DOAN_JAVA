@@ -12,7 +12,7 @@ public class duLieu {
         Connection conn = null;
         String url = "jdbc:sqlserver://localhost:1433;databaseName=RCP;encrypt=false";
         String user = "sa";
-        String password = "22082005";
+        String password = "123456789";
         try {
             // Kết nối đến SQL Server
              conn = DriverManager.getConnection(url, user, password);

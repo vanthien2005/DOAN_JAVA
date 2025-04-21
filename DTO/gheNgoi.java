@@ -16,6 +16,9 @@ public class gheNgoi {
         this.number_seat = number_seat;
         this.status = status;
     }
+    public gheNgoi() {
+        //TODO Auto-generated constructor stub
+    }
     public int getId() {
         return id;
     }

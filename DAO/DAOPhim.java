@@ -96,7 +96,7 @@ public class DAOPhim implements DAOInterFace<Phim> {
         "FROM Phim " +
         "LEFT JOIN PhongChieuPhim ON PhongChieuPhim.movie_id = Phim.id " +
         "LEFT JOIN PhongChieu ON PhongChieu.id = PhongChieuPhim.room_id " +
-        "WHERE Phim.name LIKE ? " ;
+        "WHERE Phim.name LIKE ? AND Phim.status = 1" ;
         try(Connection con = duLieu.ket_noi()) {
             PreparedStatement ptm = con.prepareStatement(sql);
             ptm.setString(1,"%" + condition + "%");
@@ -162,7 +162,8 @@ public class DAOPhim implements DAOInterFace<Phim> {
         String sql = "SELECT Phim.id, Phim.name, Phim.type,Phim.image, Phim.duration, PhongChieu.name AS name_room " +
         "FROM Phim " +
         "LEFT JOIN PhongChieuPhim ON PhongChieuPhim.movie_id = Phim.id " +
-        "LEFT JOIN PhongChieu ON PhongChieu.id = PhongChieuPhim.room_id";
+        "LEFT JOIN PhongChieu ON PhongChieu.id = PhongChieuPhim.room_id " +
+        "WHERE status = 1";
         try(Connection con = duLieu.ket_noi()) {
             PreparedStatement ptm = con.prepareStatement(sql);
             ResultSet rs = ptm.executeQuery();

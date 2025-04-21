@@ -23,8 +23,8 @@ public class PhimBLL {
         if(d.insert(p)) return "Thêm thành công";
         else return "Thêm thất bại";
     }
+    
     public String updatePhim(Phim p){
-        if(d.examId_movies(p.getId())) return "id đã tồn tại";
         if(d.update(p)) return "Sửa thành công ";
         else return  "Sửa thất bại";
     }

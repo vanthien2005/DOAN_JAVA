@@ -9,10 +9,22 @@ public class LichChieu {
     private int id;
     private int id_phim;
     private int id_phong;
+    public void setId_phong(int id_phong) {
+        this.id_phong = id_phong;
+    }
+
+
     private LocalDate tg;
     private LocalTime time;
     private String movieName ;
     private String roomName;
+    private String url;
+    public String getUrl() {
+        return url;
+    }
+    public void setUrl(String url) {
+        this.url = url;
+    }
     public String getRoomName() {
         return roomName;
     }
