@@ -24,6 +24,14 @@ public class PhimGUI {
         showPhim.setBackground(new Color(51, 51, 51));
         JPanel tk = new JPanel(new FlowLayout());
         JTextField timKiem = new JTextField();
+        JComboBox<String>chonTheLoai = new JComboBox<>();
+        ArrayList<Phim>dsTheLoai = new ArrayList<>();
+        dsTheLoai = phimBLL.dsTheLoai();
+        chonTheLoai.addItem("Tất cả");
+        for(Phim p : dsTheLoai){
+            chonTheLoai.addItem(p.getType());
+        }
+        JButton loc = new JButton("Lọc");
         timKiem.setPreferredSize(new Dimension(250, 25));
         JButton search = new JButton();
         search.setIcon(lamDep.scaleImageToFit("/ICON/search.png", 22, 22)); // Giảm kích thước icon xuống
@@ -34,6 +42,21 @@ public class PhimGUI {
         // styleIconButton(search);
         tk.add(timKiem);
         tk.add(search);
+        tk.add(chonTheLoai);
+        tk.add(loc);
+        loc.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String selectedType = (String) chonTheLoai.getSelectedItem();
+                if(selectedType.equals("Tất cả")){
+                    showPhim(mainPanel);
+                }
+                else searchType(mainPanel,selectedType);
+            }
+            
+        });
+
         search.addActionListener(new ActionListener() {
 
             @Override
@@ -78,6 +101,14 @@ public class PhimGUI {
         showPhim.setBackground(new Color(51, 51, 51));
         JPanel tk = new JPanel(new FlowLayout());
         JTextField timKiem = new JTextField();
+        JComboBox<String>chonTheLoai = new JComboBox<>();
+        ArrayList<Phim>dsTheLoai = new ArrayList<>();
+        dsTheLoai = phimBLL.dsTheLoai();
+        chonTheLoai.addItem("Tất cả");
+        for(Phim p : dsTheLoai){
+            chonTheLoai.addItem(p.getType());
+        }
+        JButton loc = new JButton("Lọc");
         timKiem.setPreferredSize(new Dimension(250, 25));
         JButton search = new JButton();
         search.setIcon(lamDep.scaleImageToFit("/ICON/search.png", 22, 22)); // Giảm kích thước icon xuống
@@ -88,6 +119,20 @@ public class PhimGUI {
         // styleIconButton(search);
         tk.add(timKiem);
         tk.add(search);
+        tk.add(chonTheLoai);
+        tk.add(loc);
+        loc.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String selectedType = (String) chonTheLoai.getSelectedItem();
+                if(selectedType.equals("Tất cả")){
+                    showPhim(mainPanel);
+                }
+                else searchType(mainPanel,selectedType);
+            }
+            
+        });
         search.addActionListener(new ActionListener() {
 
             @Override
@@ -135,6 +180,94 @@ public class PhimGUI {
         mainPanel.repaint();
 
     }
+
+    public void searchType(JPanel mainPanel,String condition){
+        JPanel showPhim = new JPanel(new GridLayout(0,5,15,15));
+        showPhim.setBackground(new Color(51, 51, 51));
+        JPanel tk = new JPanel(new FlowLayout());
+        JTextField timKiem = new JTextField();
+        JComboBox<String>chonTheLoai = new JComboBox<>();
+        ArrayList<Phim>dsTheLoai = new ArrayList<>();
+        dsTheLoai = phimBLL.dsTheLoai();
+        chonTheLoai.addItem("Tất cả");
+        for(Phim p : dsTheLoai){
+            chonTheLoai.addItem(p.getType());
+        }
+        JButton loc = new JButton("Lọc");
+        timKiem.setPreferredSize(new Dimension(250, 25));
+        JButton search = new JButton();
+        search.setIcon(lamDep.scaleImageToFit("/ICON/search.png", 22, 22)); // Giảm kích thước icon xuống
+        search.setPreferredSize(new Dimension(40, 32)); // Set kích thước nút nhỏ gọn
+        search.setFocusPainted(false); // Bỏ viền focus
+        search.setContentAreaFilled(false); // Nền trong suốt (tuỳ chọn)
+        search.setBorderPainted(false); // Không viền (tuỳ chọn)
+        // styleIconButton(search);
+        tk.add(timKiem);
+        tk.add(search);
+        tk.add(chonTheLoai);
+        tk.add(loc);
+        loc.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String selectedType = (String) chonTheLoai.getSelectedItem();
+                if(selectedType.equals("Tất cả")){
+                    showPhim(mainPanel);
+                }
+                else searchType(mainPanel,selectedType);
+            }
+            
+        });
+
+        search.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String condition = timKiem.getText();
+                if(condition.equals("")){
+                    showPhim(mainPanel);
+                }
+                else showPhim(condition,mainPanel);
+            }
+            
+        });
+        mainPanel.removeAll();
+        mainPanel.setLayout(new BorderLayout());
+        ArrayList<Phim> ds = new ArrayList<>();
+        ds = phimBLL.searchType(condition);
+        for(Phim p:ds){
+            String url = p.getUrl();
+            String name = p.getName();
+            String type = p.getType();
+            String duration = p.getDuration();
+            JPanel j = new JPanel();
+            ImageIcon i = lamDep.resizeImage(url,200,180);
+            j = taoPanelPhim(i, name, type, duration,p);
+            showPhim.add(j);
+        }
+        if(ds.size()<11){
+            for(int i = 1;i<=11-ds.size();i++)
+            {
+                JPanel j1 = new JPanel();
+                j1.setVisible(false);
+                showPhim.add(j1);
+            }
+        }
+        // tk.setBackground(new Color(173, 216, 230));
+        mainPanel.add(tk,BorderLayout.NORTH);
+        JScrollPane scrollPane = new JScrollPane(showPhim);
+        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER); // không cuộn ngang
+        scrollPane.getVerticalScrollBar().setUnitIncrement(16); // tăng tốc độ cuộn
+
+        mainPanel.add(scrollPane, BorderLayout.CENTER);
+
+
+        mainPanel.revalidate(); // cập nhật lại layout
+        mainPanel.repaint();
+
+    }
+
+
     
     public JPanel taoPanelPhim(ImageIcon anhPhim, String tenPhim, String theLoai, String thoiLuong,Phim phim) {
         JPanel panelPhim = new JPanel();
@@ -190,10 +323,15 @@ public class PhimGUI {
         JButton btnChonAnh = new JButton("chọn ảnh");
 
         JDialog editDialog = new JDialog(v, "Sửa thông tin phim", true);
-        editDialog.setSize(400, 300);
+        editDialog.setSize(400, 500);
         editDialog.setLocationRelativeTo(v);
-        editDialog.setLayout(new GridLayout(5, 2, 10, 10));
-    
+        editDialog.setLayout(new BorderLayout());
+        JLabel formSua = new JLabel("Form sửa phim");
+        formSua.setFont(new Font("Time new roman", Font.BOLD, 20));
+        formSua.setBorder(BorderFactory.createEmptyBorder(30, 120, 20, 50));
+
+        JPanel content = new JPanel(new GridLayout(0,2,5,60));
+        content.setBorder(BorderFactory.createEmptyBorder(20, 30, 20, 20));
         // Tạo các field
         JTextField tfTen = new JTextField(p.getName());
         JTextField tfTheLoai = new JTextField(p.getType());
@@ -202,14 +340,14 @@ public class PhimGUI {
         tfUrl.setEditable(false);
     
         // Thêm vào dialog
-        editDialog.add(new JLabel("Tên phim:"));
-        editDialog.add(tfTen);
-        editDialog.add(new JLabel("Thể loại:"));
-        editDialog.add(tfTheLoai);
-        editDialog.add(new JLabel("Thời lượng:"));
-        editDialog.add(tfThoiLuong);
-        editDialog.add(btnChonAnh);
-        editDialog.add(tfUrl);
+        content.add(new JLabel("Tên phim:"));
+        content.add(tfTen);
+        content.add(new JLabel("Thể loại:"));
+        content.add(tfTheLoai);
+        content.add(new JLabel("Thời lượng:"));
+        content.add(tfThoiLuong);
+        content.add(btnChonAnh);
+        content.add(tfUrl);
 
         btnChonAnh.addActionListener(new ActionListener() {
 
@@ -225,12 +363,13 @@ public class PhimGUI {
             }
             
         });
+        JPanel buttons = new JPanel(new FlowLayout());
     
         JButton btnLuu = new JButton("Lưu");
         JButton btnHuy = new JButton("Hủy");
     
-        editDialog.add(btnLuu);
-        editDialog.add(btnHuy);
+        buttons.add(btnLuu);
+        buttons.add(btnHuy);
     
         btnLuu.addActionListener(new ActionListener() {
             @Override
@@ -251,16 +390,22 @@ public class PhimGUI {
                 editDialog.dispose();
             } 
         });
-            editDialog.setVisible(true);
+        editDialog.add(formSua,BorderLayout.NORTH);
+        editDialog.add(content,BorderLayout.CENTER);
+        editDialog.add(buttons,BorderLayout.SOUTH);
+        editDialog.setVisible(true);
         }
     
         //    form thêm đối tượng    //
     public void formThemPhim(View v) {
 
         JDialog addDialog = new JDialog(v, "Thêm phim mới", true);
-        addDialog.setSize(400, 300);
+        addDialog.setSize(400, 500);
         addDialog.setLocationRelativeTo(v);
-        addDialog.setLayout(new GridLayout(6, 2, 10, 10));
+        addDialog.setLayout(new BorderLayout());
+        JLabel formThem = new JLabel("Form thêm phim");
+        formThem.setFont(new Font("Time new roman", Font.BOLD, 20));
+        formThem.setBorder(BorderFactory.createEmptyBorder(20, 100, 20, 40));
 
         JTextField tfId = new JTextField();
         JTextField tfTen = new JTextField();
@@ -270,25 +415,31 @@ public class PhimGUI {
         tfUrl.setEditable(false); // không cho người dùng gõ tay
 
         JButton btnChonAnh = new JButton("Chọn ảnh...");
-
-        addDialog.add(new JLabel("ID phim:"));
-        addDialog.add(tfId);
-        addDialog.add(new JLabel("Tên phim:"));
-        addDialog.add(tfTen);
-        addDialog.add(new JLabel("Thể loại:"));
-        addDialog.add(tfTheLoai);
-        addDialog.add(new JLabel("Thời lượng:"));
-        addDialog.add(tfThoiLuong);
-        addDialog.add(btnChonAnh);
-        addDialog.add(tfUrl);
+        JPanel content = new JPanel();
+        content.setLayout(new GridLayout(0,2,5,50));
+        content.setBorder(BorderFactory.createEmptyBorder(10, 30, 10, 20));
+        content.add(new JLabel("ID phim:"));
+        content.add(tfId);
+        content.add(new JLabel("Tên phim:"));
+        content.add(tfTen);
+        content.add(new JLabel("Thể loại:"));
+        content.add(tfTheLoai);
+        content.add(new JLabel("Thời lượng:"));
+        content.add(tfThoiLuong);
+        content.add(btnChonAnh);
+        content.add(tfUrl);
          // dùng nút chọn ảnh thay vì nhập tay
+         JPanel bottom = new JPanel();
+         bottom.setLayout(new FlowLayout());
 
         JButton btnLuu = new JButton("Lưu");
         JButton btnHuy = new JButton("Hủy");
 
-        addDialog.add(btnLuu);
-        addDialog.add(btnHuy);
-
+        bottom.add(btnLuu);
+        bottom.add(btnHuy);
+        addDialog.add(formThem,BorderLayout.NORTH);
+        addDialog.add(content,BorderLayout.CENTER);
+        addDialog.add(bottom,BorderLayout.SOUTH);
         // Xử lý chọn ảnh
         btnChonAnh.addActionListener(e -> {
             JFileChooser fileChooser = new JFileChooser();

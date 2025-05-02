@@ -18,7 +18,8 @@ public class DAODoanhThu  {
         "join ChiTietHoaDon on ChiTietHoaDon.id_SP = sanPham.id " + 
         "join HoaDon on HoaDon.id = ChiTietHoaDon.id_HD " + 
         "Where HoaDon.status = N'Đã thanh toán' AND HoaDon.date > ? AND HoaDon.date < ? " + 
-        "group by sanPham.price,sanPham.name,sanPham.id ";
+        "group by sanPham.price,sanPham.name,sanPham.id " +
+        "ORDER BY totalTien DESC ";
         try(Connection con = duLieu.ket_noi()) {
             PreparedStatement ptm = con.prepareStatement(sql);
             ptm.setDate(1, from);
@@ -49,8 +50,9 @@ public class DAODoanhThu  {
                                 "FROM Phim " + 
                                 "JOIN LichChieu ON LichChieu.movie_id = Phim.id " + 
                                 "JOIN Ve ON Ve.showTime_id = LichChieu.id " + 
-                                "WHERE LichChieu.date > ? AND LichChieu.date < ? AND Ve.status = N'Đã thanh toán'" +
-                                "GROUP BY Phim.name, Phim.type ";
+                                "WHERE LichChieu.date > ? AND LichChieu.date < ? AND Ve.status = N'Đã thanh toán' " +
+                                "GROUP BY Phim.name, Phim.type " +
+                                "ORDER BY total_revenue DESC ";
             try (Connection con = duLieu.ket_noi()){
                 PreparedStatement ptm = con.prepareStatement(sql);
                 ptm.setDate(1, from);

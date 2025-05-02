@@ -180,7 +180,8 @@ public class DAOLichChieu implements DAOInterFace<LichChieu> {
         String sql = "SELECT l.id, l.movie_id, l.room_id, l.date , l.time , PhongChieu.name AS roomName , Phim.image AS anhPhim, Phim.name AS movieName " +
         "FROM LichChieu l " +
         "JOIN PhongChieu ON PhongChieu.id = l.room_id " +
-        "JOIN Phim ON Phim.id = l.movie_id";
+        "JOIN Phim ON Phim.id = l.movie_id " +
+        "WHERE Phim.status = 1 ";
  
         try(Connection con = duLieu.ket_noi()) {
         PreparedStatement ptm = con.prepareStatement(sql);

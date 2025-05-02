@@ -26,6 +26,8 @@ public class View extends JFrame implements ActionListener {
     LichChieuGUI lichGUI = new LichChieuGUI();
     HoaDonGUI hoaDonGUI = new HoaDonGUI();
     DoanhThuGUI doanhThuGUI = new DoanhThuGUI();
+    NhanVienGUI nhanVienGUI = new NhanVienGUI();
+    KhachHangGUI khachHangGUI = new KhachHangGUI();
 
     private String currentMenu = "Home";
     
@@ -68,11 +70,11 @@ public class View extends JFrame implements ActionListener {
         styleButton(lichChieu);
         leftMenu.add(lichChieu);
 
-        phongChieu = new JButton("Phòng chiếu");
-        phongChieu.setIcon(scaleIcon("/ICON/room.png", 32, 32));
-        phongChieu.addActionListener(this);
-        styleButton(phongChieu);
-        leftMenu.add(phongChieu);
+        // phongChieu = new JButton("Phòng chiếu");
+        // phongChieu.setIcon(scaleIcon("/ICON/room.png", 32, 32));
+        // phongChieu.addActionListener(this);
+        // styleButton(phongChieu);
+        // leftMenu.add(phongChieu);
 
         sanPham  =new JButton("Sản Phẩm");
         sanPham.setIcon(scaleIcon("/ICON/product.png", 32, 32));
@@ -136,7 +138,7 @@ public class View extends JFrame implements ActionListener {
         menuButtons.add(home);
         menuButtons.add(phim);
         menuButtons.add(lichChieu);
-        menuButtons.add(phongChieu);
+        // menuButtons.add(phongChieu);
         menuButtons.add(sanPham);
         menuButtons.add(hoaDon);
         menuButtons.add(ve);
@@ -198,35 +200,47 @@ public class View extends JFrame implements ActionListener {
         // Cập nhật trạng thái menu hiện tại
         if (src == home) {
             currentMenu = "Home";
+            bottom.setVisible(false);
             showHome();  // Hiển thị trang chủ
         } else if (src == phim) {
             currentMenu = "Phim";
-            phimGUI.showPhim(mainPanel);  // Hiển thị danh sách phim
+            phimGUI.showPhim(mainPanel); 
+            bottom.setVisible(true); // Hiển thị danh sách phim
         } else if (src == lichChieu) {
             currentMenu = "LichChieu";
             lichGUI.showLichChieu(mainPanel); // Hiển thị danh sách lịch chiếu
-        } else if (src == phongChieu) {
-            currentMenu = "PhongChieu";
-             // Hiển thị danh sách phòng chiếu
+            bottom.setVisible(true);
+        // } else if (src == phongChieu) {
+        //     currentMenu = "PhongChieu";
+        //      // Hiển thị danh sách phòng chiếu
+        //      bottom.setVisible(true);
         } else if(src==sanPham){
             currentMenu = "SanPham";
             sanPhamGUI.showSanPham(mainPanel);
+            bottom.setVisible(true);
         }else if(src==hoaDon){
             currentMenu  = "HoaDon";
             hoaDonGUI.showHoaDon(mainPanel);
+            bottom.setVisible(true);
         }
         else if (src == ve) {
             currentMenu = "Ve";
-            veGUI.showVe(mainPanel);  // Hiển thị danh sách vé
+            veGUI.showVe(mainPanel); 
+            bottom.setVisible(true); // Hiển thị danh sách vé
         } else if (src == nhanVien) {
             currentMenu = "NhanVien";
           // Hiển thị danh sách nhân viên
+          nhanVienGUI.showNhanVien(mainPanel);
+          bottom.setVisible(true);
         } else if (src == khachHang) {
             currentMenu = "KhachHang";
             // Hiển thị danh sách khách hàng
+            khachHangGUI.showKhachHang(mainPanel,this);
+            bottom.setVisible(true);
         } else if (src == thongKeDoanhThu) {
             currentMenu = "DoanhThu";
-            doanhThuGUI.showDoanhThu(mainPanel);  // Hiển thị thống kê doanh thu
+            doanhThuGUI.showDoanhThu(mainPanel);
+            bottom.setVisible(false);  // Hiển thị thống kê doanh thu
         }
     }
 
@@ -252,9 +266,6 @@ public class View extends JFrame implements ActionListener {
                 lichGUI.xoaLichChieu(this);
             break;
 
-            case "Phong":
-
-            break;
             case "SanPham":
           
                 sanPhamGUI.xoaSanPham(sanPhamGUI.selectedSanPham, this);
@@ -270,14 +281,11 @@ public class View extends JFrame implements ActionListener {
 
             break;
             case "NhanVien":
-
+            nhanVienGUI.xoaNhanVien(this);
             break;
             case "KhachHang":
 
-            break;
-
-            case "DoanhThu":
-            
+            khachHangGUI.formXoaKH(this);
             break;
       
         }
@@ -299,9 +307,9 @@ public class View extends JFrame implements ActionListener {
                 }
                 lichGUI.formSuaLichChieu(lichGUI.selectedLichChieu, this);
             break;
-            case "Phong":
+            // case "Phong":
 
-            break;
+            // break;
             case "SanPham":
             if(sanPhamGUI.selectedSanPham==null){
                 JOptionPane.showMessageDialog(null, "vui lòng chọn 1 sản phẩm để sửa", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
@@ -317,14 +325,14 @@ public class View extends JFrame implements ActionListener {
            
             break;
             case "NhanVien":
-
+            
+            nhanVienGUI.formSuaNhanVien(this);
             break;
             case "KhachHang":
-
+            khachHangGUI.formSuaKH(null);
             break;
 
-            case "DoanhThu":
-            break;
+           
 
             default:
                 break;
@@ -339,9 +347,9 @@ public class View extends JFrame implements ActionListener {
             case "LichChieu":
                 lichGUI.formThemLichChieu(this);  
             break;
-            case "Phong":
+            // case "Phong":
 
-            break;
+            // break;
             case "SanPham":
             sanPhamGUI.formThemSanPham(this);
             break;
@@ -355,14 +363,14 @@ public class View extends JFrame implements ActionListener {
                 veGUI.formThemVe(this);
             break;
             case "NhanVien":
+            nhanVienGUI.formThemNhanVien(this);
 
             break;
             case "KhachHang":
-
+            khachHangGUI.formThemKH(this);
             break;
 
-            case "DoanhThu":
-            break;
+        
     }
 }
 

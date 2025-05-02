@@ -127,12 +127,12 @@ public class DAOPhim implements DAOInterFace<Phim> {
         ArrayList<Phim> ds = new ArrayList<>();
         String sql = "SELECT Phim.id, Phim.name, Phim.type, Phim.duration,Phim.image, PhongChieu.name AS name_room " +
         "FROM Phim " +
-        "INNER JOIN PhongChieuPhim ON PhongChieuPhim.movie_id = Phim.id " +
-        "INNER JOIN PhongChieu ON PhongChieu.id = PhongChieuPhim.room_id " +
-        "WHERE type LIKE ? " ;
+        "LEFT JOIN PhongChieuPhim ON PhongChieuPhim.movie_id = Phim.id " +
+        "LEFT JOIN PhongChieu ON PhongChieu.id = PhongChieuPhim.room_id " +
+        "WHERE Phim.type LIKE ? AND Phim.status = 1 " ;
         try(Connection con = duLieu.ket_noi()) {
             PreparedStatement ptm = con.prepareStatement(sql);
-            ptm.setString(1, "%"+condition+"%");
+            ptm.setString(1, "%"+ condition +"%");
             ResultSet rs = ptm.executeQuery();
                 while (rs.next()) {
                     int id = rs.getInt("id");
@@ -189,5 +189,22 @@ public class DAOPhim implements DAOInterFace<Phim> {
             duLieu.close();
         }
     }
-    
+    public ArrayList<Phim>dsTheLoai(){
+        ArrayList<Phim>ds = new ArrayList<>();
+        String sql = "SELECT DISTINCT type FROM Phim";
+        try(Connection con = duLieu.ket_noi()) {
+            PreparedStatement ptm = con.prepareStatement(sql);
+            ResultSet rs = ptm.executeQuery();
+            while (rs.next()) {
+                Phim p = new Phim();
+                p.setType(rs.getString("type"));
+                ds.add(p);
+                
+            }
+            return ds;
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return null;
+        }
+    }
 }

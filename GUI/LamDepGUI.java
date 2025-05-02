@@ -44,5 +44,8 @@ public class LamDepGUI {
         NumberFormat nf = NumberFormat.getInstance(new Locale("vi", "VN"));
         return nf.format(soTien) + " VNĐ";
 }
+public static boolean isValidPhoneNumber(String phoneNumber) {
+    return phoneNumber.matches("^0[3589]\\d{8}$");
+}
 
 }

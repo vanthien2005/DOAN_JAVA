@@ -18,4 +18,7 @@ public class NhanVien extends Nguoi {
         this.position = position;
     
 }
+    public NhanVien() {
+        //TODO Auto-generated constructor stub
+    }
 }

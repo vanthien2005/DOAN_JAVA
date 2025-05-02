@@ -7,6 +7,20 @@ public class SanPham {
     private int price;
     private String status;
     private String image;
+    private int tongSL;
+    private int tongGia;
+    public int getTongGia() {
+        return tongGia;
+    }
+    public void setTongGia(int tongGia) {
+        this.tongGia = tongGia;
+    }
+    public int getTongSL() {
+        return tongSL;
+    }
+    public void setTongSL(int tongSL) {
+        this.tongSL = tongSL;
+    }
     public String getImage() {
         return image;
     }

@@ -62,7 +62,12 @@ public class HoaDonGUI {
         them = new JPanel();
         content = new JPanel(new BorderLayout());
         them.setLayout(new GridLayout());
-        DefaultTableModel model = new DefaultTableModel();
+        DefaultTableModel model = new DefaultTableModel() {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false; // Không ô nào được sửa
+            }
+        };
         model.addColumn("Số hóa đơn");
         model.addColumn("Tên khách hàng");
         model.addColumn("Sản phẩm");
@@ -137,7 +142,12 @@ public class HoaDonGUI {
         them = new JPanel();
         content = new JPanel(new BorderLayout());
         them.setLayout(new GridLayout());
-        DefaultTableModel model = new DefaultTableModel();
+        DefaultTableModel model = new DefaultTableModel() {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false; // Không ô nào được sửa
+            }
+        };
         model.addColumn("Số hóa đơn");
         model.addColumn("Tên khách hàng");
         model.addColumn("Sản phẩm");

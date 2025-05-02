@@ -146,38 +146,46 @@ public class SanPhamGUI {
          JButton btnChonAnh;
          JButton btnLuu,btnHuy;
          JDialog addDialog = new JDialog(v, "Thêm sản phẩm mới", true);
-         addDialog.setSize(400, 300);
+         addDialog.setSize(350, 450);
          addDialog.setLocationRelativeTo(v);
-         addDialog.setLayout(new GridLayout(0,2,20,20));
+         addDialog.setLayout(new BorderLayout());
+
+         JLabel formThem = new JLabel("Form thêm sản phẩm");
+         formThem.setFont(new Font("Time new roman", Font.BOLD, 20));
+         formThem.setBorder(BorderFactory.createEmptyBorder(20, 60, 20, 50));
 
         // Tên sản phẩm
-
-        addDialog.add(new JLabel("Tên sản phẩm:"));
+        JPanel content = new JPanel(new GridLayout(0,2,10,50));
+        content.setBorder(BorderFactory.createEmptyBorder(30, 40, 30, 5));
+        content.add(new JLabel("Tên sản phẩm:"));
         txtTenSP = new JTextField(20);
-        addDialog.add(txtTenSP);
+        content.add(txtTenSP);
 
-        addDialog.add(new Label("Loại: "));
+        content.add(new JLabel("Loại: "));
         cmbLoai = new JComboBox<>(new String[] {"Nước", "Đồ ăn"});
-        addDialog.add(cmbLoai);
+        content.add(cmbLoai);
 
-        addDialog.add(new JLabel("Giá:"));
+        content.add(new JLabel("Giá:"));
         txtGia = new JTextField(20);
-        addDialog.add(txtGia);
+        content.add(txtGia);
 
 
         btnChonAnh = new JButton("Chọn ảnh");
         btnChonAnh.setSize(50,50);
-        addDialog.add(btnChonAnh);
+        content.add(btnChonAnh);
         txtAnh = new JTextField(15);
-        addDialog.add(txtAnh);
+        content.add(txtAnh);
         txtAnh.setEditable(false);
 
-
+        JPanel buttons = new JPanel(new FlowLayout(FlowLayout.CENTER));
         btnLuu = new JButton("Lưu");
-        addDialog.add(btnLuu);
+        buttons.add(btnLuu);
 
         btnHuy = new JButton("Hủy");
-        addDialog.add(btnHuy);
+        buttons.add(btnHuy);
+        addDialog.add(formThem,BorderLayout.NORTH);
+        addDialog.add(content,BorderLayout.CENTER);
+        addDialog.add(buttons,BorderLayout.SOUTH);
         // Xử lý chọn ảnh
         btnChonAnh.addActionListener(e -> {
             JFileChooser chooser = new JFileChooser();
@@ -246,43 +254,46 @@ public class SanPhamGUI {
         JButton btnChonAnh;
         JButton btnLuu,btnHuy;
         JDialog addDialog = new JDialog(v, "Sửa sản phẩm", true);
-        addDialog.setSize(500, 400);
+        addDialog.setSize(350, 450);
         addDialog.setLocationRelativeTo(v);
-        addDialog.setLayout(new GridLayout(0,2,20,20));
-
+        addDialog.setLayout(new BorderLayout());
+        JLabel formSua = new JLabel("Form sửa sản phẩm");
+        formSua.setFont(new Font("Time new roman", Font.BOLD, 20));
+        formSua.setBorder(BorderFactory.createEmptyBorder(20, 65, 20, 50));
        // Tên sản phẩm
-
-       addDialog.add(new JLabel("Tên sản phẩm:"));
+       JPanel content = new JPanel(new GridLayout(0,2,10,50));
+       content.setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 5));
+       content.add(new JLabel("Tên sản phẩm:"));
        txtTenSP = new JTextField();
        txtTenSP.setSize(100, 30);
        txtTenSP.setText(p.getName());
-       addDialog.add(txtTenSP);
+       content.add(txtTenSP);
 
-       addDialog.add(new Label("Loại: "));
+       content.add(new JLabel("Loại: "));
        cmbLoai = new JComboBox<>(new String[] {"Nước", "Đồ ăn"});
        cmbLoai.setSelectedItem(p.getType());
-       addDialog.add(cmbLoai);
+       content.add(cmbLoai);
 
-       addDialog.add(new JLabel("Giá:"));
+       content.add(new JLabel("Giá:"));
        txtGia = new JTextField();
        txtGia.setText(p.getPrice()+"");
-       addDialog.add(txtGia);
+       content.add(txtGia);
 
 
        btnChonAnh = new JButton("Chọn ảnh");
        btnChonAnh.setSize(50,50);
-       addDialog.add(btnChonAnh);
+       content.add(btnChonAnh);
        txtAnh = new JTextField();
        txtAnh.setText(p.getImage());
-       addDialog.add(txtAnh);
+       content.add(txtAnh);
        txtAnh.setEditable(false);
 
-
+       JPanel buttons = new JPanel(new FlowLayout());
        btnLuu = new JButton("Lưu");
-       addDialog.add(btnLuu);
+       buttons.add(btnLuu);
 
        btnHuy = new JButton("Hủy");
-       addDialog.add(btnHuy);
+       buttons.add(btnHuy);
        // Xử lý chọn ảnh
        btnChonAnh.addActionListener(e -> {
            JFileChooser chooser = new JFileChooser();
@@ -308,6 +319,9 @@ public class SanPhamGUI {
        btnHuy.addActionListener(e->{
         addDialog.dispose();
        });
+       addDialog.add(formSua,BorderLayout.NORTH);
+       addDialog.add(content,BorderLayout.CENTER);
+       addDialog.add(buttons,BorderLayout.SOUTH);
 
        addDialog.setVisible(true);
     }

@@ -40,6 +40,7 @@ public class DAOHoaDon implements DAOInterFace<HoaDon> {
         Nguoi n = new Nguoi();
         n.setName(t.getNameKhachHang());
         n.setNumberPhone(t.getSdt());
+        n.setStatus("T");
 
         int idKhachHang = d.insertAndGetId(n);
         int idHoaDon = -1;
@@ -169,6 +170,8 @@ try(Connection conn = duLieu.ket_noi()) {
 try(Connection conn = duLieu.ket_noi()) {
     PreparedStatement ptm = conn.prepareStatement(sql);
     ptm.setString(1,"%"+condition+"%");
+    System.out.println("Condition: " + condition);
+    System.out.println("SQL: " + ptm.toString());
     ResultSet rs = ptm.executeQuery();
     while (rs.next()) {
         int id = rs.getInt("maHoaDon");
@@ -219,6 +222,8 @@ GROUP BY
 try(Connection conn = duLieu.ket_noi()) {
 PreparedStatement ptm = conn.prepareStatement(sql);
 ptm.setDate(1,condition);
+System.out.println("Condition: " + condition);
+System.out.println("SQL: " + ptm.toString());
 ResultSet rs = ptm.executeQuery();
 while (rs.next()) {
     int id = rs.getInt("maHoaDon");

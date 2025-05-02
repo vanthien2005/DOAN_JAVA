@@ -12,7 +12,7 @@ public class NhanVienBLL {
     }
 
     public String insertNhanVien(NhanVien n){
-        if(d.examId(n.getId())) return "thêm thành công";
+        if(d.insert(n)) return "thêm thành công";
         return "thêm thất bại";
     }
 

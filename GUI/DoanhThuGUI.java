@@ -62,7 +62,12 @@ public class DoanhThuGUI {
         JPanel content = new JPanel(new GridLayout(0,1,0,10));
 
         // Bảng sản phẩm
-        DefaultTableModel modelSanPham = new DefaultTableModel();
+        DefaultTableModel modelSanPham = new DefaultTableModel() {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false; // Không ô nào được sửa
+            }
+        };
         modelSanPham.addColumn("Tên sản phẩm");
         modelSanPham.addColumn("Số lượng đã bán");
         modelSanPham.addColumn("Đơn giá");
@@ -72,7 +77,12 @@ public class DoanhThuGUI {
         tableDoanhThuSP.setFont(new Font("Time new roman", Font.BOLD, 15));
 
         // Bảng phim
-        DefaultTableModel modelPhim = new DefaultTableModel();
+        DefaultTableModel modelPhim = new DefaultTableModel() {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false; // Không ô nào được sửa
+            }
+        };
         modelPhim.addColumn("Tên bộ phim");
         modelPhim.addColumn("Thể loại");
         modelPhim.addColumn("Số vé đã bán");
@@ -91,7 +101,12 @@ public class DoanhThuGUI {
         header1.setFont(new Font("Time new roman", Font.BOLD, 18)); 
         header1.setBackground(new Color(173, 216, 230));
 
-        DefaultTableModel modelTong = new DefaultTableModel();
+        DefaultTableModel modelTong = new DefaultTableModel() {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false; // Không ô nào được sửa
+            }
+        };
 
         content.add(js1);
         content.add(js);
@@ -118,19 +133,34 @@ public class DoanhThuGUI {
                     doanhThuSP = doanhThuBLL.getDoanhThuSP(dateFrom, dateTo);
                     doanhThuPhim = doanhThuBLL.getDoanhThuPhim(dateFrom, dateTo);
 
+
                     modelSanPham.setRowCount(0); // clear dữ liệu cũ
                     modelPhim.setRowCount(0);
                     modelTong.setRowCount(0);
+                    int tongTienTuSP = 0;
+                    int tongTienTuPhim = 0;
 
                     for(DoanhThu d : doanhThuSP){
                         Object[] row = {d.getNameSP(),d.getTotalSLDaBan(),lamDepGUI.formatVNDPlain(d.getGiaSp()),lamDepGUI.formatVNDPlain(d.getTotalTienThuTuSP())};
                         modelSanPham.addRow(row);
+                        tongTienTuSP += d.getTotalTienThuTuSP();
                     }
 
                     for(DoanhThu d : doanhThuPhim){
                         Object[] row1 = {d.getNamePhim(),d.getType(),d.getSoLanDuocDat(),lamDepGUI.formatVNDPlain(d.getTotalTienThuPhim())};
                         modelPhim.addRow(row1);
+                        tongTienTuPhim += d.getTotalTienThuPhim();
                     }
+                   
+                    int tongTien = tongTienTuSP + tongTienTuPhim;
+
+                    // Thêm dòng tổng doanh thu mới vào bảng
+                    String row[] = {
+                        lamDepGUI.formatVNDPlain(tongTienTuSP),
+                        lamDepGUI.formatVNDPlain(tongTienTuPhim),
+                        lamDepGUI.formatVNDPlain(tongTien)
+                    };
+                    modelTong.addRow(row);
 
                 } catch (Exception e1) {
                     JOptionPane.showMessageDialog(null, "Bạn nhập không đúng định dạng ngày (yyyy-mm-dd)", "Thông báo", JOptionPane.INFORMATION_MESSAGE);

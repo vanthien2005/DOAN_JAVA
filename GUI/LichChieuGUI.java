@@ -213,10 +213,13 @@ public class LichChieuGUI {
 
        public void formThemLichChieu(View v){
 
-        JDialog addDialog = new JDialog(v, "Thêm phim mới", true);
-        addDialog.setSize(400, 300);
+        JDialog addDialog = new JDialog(v, "Thêm lịch chiếu", true);
+        addDialog.setSize(400, 500);
         addDialog.setLocationRelativeTo(v);
         addDialog.setLayout(new BorderLayout());
+        JLabel formThem = new JLabel("Form thêm lịch chiếu");
+        formThem.setFont(new Font("Time new roman", Font.BOLD, 20));
+        formThem.setBorder(BorderFactory.createEmptyBorder(20, 100, 20, 50));
         JTextField tfId = new JTextField();
         tfId.setPreferredSize(new Dimension(200, 25));
         
@@ -246,32 +249,27 @@ public class LichChieuGUI {
         }
 
         JPanel content = new JPanel();
-        content.setLayout(new BoxLayout(content, BoxLayout.Y_AXIS));
+        content.setLayout(new GridLayout(0,2,10,50));
+        content.setBorder(BorderFactory.createEmptyBorder(10, 40, 20, 5));
 
-        JPanel row1 = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        row1.add(new JLabel("ID Lịch chiếu:"));
-        row1.add(tfId);
+        content.add(new JLabel("ID Lịch chiếu:"));
+        content.add(tfId);
 
-        JPanel row2 = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        row2.add(new JLabel("phim: "));
-        row2.add(chonPhim);
-        JPanel row3 = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        row3.add(new JLabel("phòng:"));
-        row3.add(chonPhong);
 
-        JPanel row4 = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        content.add(new JLabel("phim: "));
+        content.add(chonPhim);
+
+        content.add(new JLabel("phòng:"));
+        content.add(chonPhong);
+
+
         JLabel lblNgay = new JLabel("Ngày tháng năm (yyyy-mm-dd):");
-        row4.add(lblNgay);
-        row4.add(tfNgay);
+        content.add(lblNgay);
+        content.add(tfNgay);
 
-        JPanel row5 = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        row5.add(new JLabel("Giờ(hh:mm):"));
-        row5.add(tfGio);
-        content.add(row1);
-        content.add(row2);
-        content.add(row3);
-        content.add(row4);
-        content.add(row5);
+        content.add(new JLabel("Giờ(hh:mm):"));
+        content.add(tfGio);
+
 
         JPanel buttons = new JPanel(new FlowLayout(FlowLayout.CENTER));
 
@@ -279,11 +277,15 @@ public class LichChieuGUI {
         JButton btnHuy = new JButton("Hủy");
         buttons.add(btnLuu);
         buttons.add(btnHuy);
+        addDialog.add(formThem,BorderLayout.NORTH);
         addDialog.add(content,BorderLayout.CENTER);
         addDialog.add(buttons,BorderLayout.SOUTH);
         btnLuu.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                if(tfId.getText().trim().isEmpty() || tfNgay.getText().trim().isEmpty() || tfGio.getText().trim().isEmpty()){
+                    JOptionPane.showMessageDialog(null, "Vui lòng nhập đầy đủ thông tin", "Thông báo", JOptionPane.ERROR_MESSAGE);
+                }
                 int id = Integer.parseInt(tfId.getText());
                 String selectedPhim = (String) chonPhim.getSelectedItem();
                 String array[] = selectedPhim.split(":");
@@ -320,37 +322,70 @@ public class LichChieuGUI {
 public void formSuaLichChieu(LichChieu p,View v){
 
     JDialog editDialog = new JDialog(v, "Sửa thông tin phim", true);
-    editDialog.setSize(400, 300);
+    editDialog.setSize(400, 500);
     editDialog.setLocationRelativeTo(v);
-    editDialog.setLayout(new GridLayout(5, 2, 10, 10));
-
+    editDialog.setLayout(new BorderLayout());
+    JLabel formSua = new JLabel("Form Sửa lịch chiếu");
+    formSua.setFont(new Font("Time new roman", Font.BOLD, 20));
+    formSua.setBorder(BorderFactory.createEmptyBorder(30, 100, 20, 40));
+    ArrayList<Phim>dsPhim = new ArrayList<>();
+    dsPhim = l.dsPhim();
+    String phimHT = p.getMovieName();
     // Tạo các field
-    JTextField tfIdPhim = new JTextField(p.getIdPhim()+"");
-    JTextField tfIdPhong = new JTextField(p.getIdPhong()+"");
+    JComboBox<String>chonPhim = new JComboBox<>();
+    for(Phim phim : dsPhim){
+            String row = phim.getId()+":"+phim.getName();
+            chonPhim.addItem(row);
+            if(phim.getName().equals(phimHT)) {
+                chonPhim.setSelectedItem(row);
+            }
+    }
+   JComboBox<String>chonPhong = new JComboBox<>();
+   String phongHT = p.getRoomName();
+   ArrayList<PhongChieu> dsPhong = new ArrayList<>();
+   dsPhong = l.dsPhongChieu();
+   for(PhongChieu phong : dsPhong){
+ 
+        String row1 = phong.getID()+":"+phong.getName();
+        chonPhong.addItem(row1);
+        if(phong.getName().equals(phongHT)){
+            chonPhong.setSelectedItem(row1);
+        }
+    
+   }
+
     JTextField tfNgay = new JTextField(p.getTg().toString());
     JTextField tfGio = new JTextField(p.getTime().toString());
-
+    JPanel content = new JPanel(new GridLayout(0,2,5,70));
+    content.setBorder(BorderFactory.createEmptyBorder(20, 40, 20, 5));
     // Thêm vào dialog
-    editDialog.add(new JLabel("ID phim:"));
-    editDialog.add(tfIdPhim);
-    editDialog.add(new JLabel("ID phòng:"));
-    editDialog.add(tfIdPhong);
-    editDialog.add(new JLabel("Ngày tháng năm:"));
-    editDialog.add(tfNgay);
-    editDialog.add(new JLabel("Giờ:"));
-    editDialog.add(tfGio);
+    content.add(new JLabel("chọn phim:"));
+    content.add(chonPhim);
+    content.add(new JLabel("chọn phòng:"));
+    content.add(chonPhong);
+    content.add(new JLabel("Ngày tháng năm:"));
+    content.add(tfNgay);
+    content.add(new JLabel("Giờ:"));
+    content.add(tfGio);
 
+    JPanel buttons = new JPanel(new FlowLayout());
     JButton btnLuu = new JButton("Lưu");
     JButton btnHuy = new JButton("Hủy");
 
-    editDialog.add(btnLuu);
-    editDialog.add(btnHuy);
+    buttons.add(btnLuu);
+    buttons.add(btnHuy);
 
     btnLuu.addActionListener(new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent e) {
-            p.setIdPhim(Integer.parseInt(tfIdPhim.getText()));
-            p.setId_phong(Integer.parseInt(tfIdPhong.getText().trim()));
+            String selectedPhim = (String) chonPhim.getSelectedItem();
+            String []array = selectedPhim.split(":");
+
+            String selectedPhong = (String) chonPhong.getSelectedItem();
+            String []array1 = selectedPhong.split(":");
+
+            p.setIdPhim(Integer.parseInt(array[0]));
+            p.setId_phong(Integer.parseInt(array1[0]));
             if (!isValidLocalDate(tfNgay.getText().trim())) {
                 JOptionPane.showMessageDialog(editDialog, "bạn nhập không đúng định dạng ngày vui lòng nhập lại!");
                 return;
@@ -373,6 +408,10 @@ public void formSuaLichChieu(LichChieu p,View v){
             editDialog.dispose();
         } 
     });
+        editDialog.add(formSua,BorderLayout.NORTH);
+        editDialog.add(content,BorderLayout.CENTER);
+        editDialog.add(buttons,BorderLayout.SOUTH);
+    
         editDialog.setVisible(true);
     }
 

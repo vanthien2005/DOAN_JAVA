@@ -32,5 +32,10 @@ public class PhimBLL {
     public ArrayList<Phim>searchName(String condition){
         return d.selectCondition(condition);
     }
-
+    public ArrayList<Phim>dsTheLoai(){
+        return d.dsTheLoai();
+    }
+    public ArrayList<Phim> searchType(String type){
+        return d.searchType(type);
+    }
 }

@@ -7,9 +7,13 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.sql.Statement;
+import java.time.LocalDate;
+import java.time.LocalTime;
 
 import DataBase.duLieu;
 import DTO.Nguoi;
+import DTO.SanPham;
+import DTO.Ve;
 
 public class DAOKhachHang implements DAOInterFace<Nguoi> {
     public static DAOKhachHang getInstance(){
@@ -55,11 +59,12 @@ public class DAOKhachHang implements DAOInterFace<Nguoi> {
     }
 
     public int insertAndGetId(Nguoi n) {
-        String sql = "INSERT INTO khachHang (name, numberPhone) VALUES (?, ?)";
+        String sql = "INSERT INTO khachHang (name, numberPhone,status) VALUES (?, ?,?)";
         try (Connection conn = duLieu.ket_noi()) {
             PreparedStatement ptm = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             ptm.setString(1, n.getName());
             ptm.setString(2, n.getNumberPhone());
+            ptm.setString(3, n.getStatus());
             int affectedRows = ptm.executeUpdate();
     
             if (affectedRows == 0) {
@@ -100,7 +105,7 @@ public class DAOKhachHang implements DAOInterFace<Nguoi> {
 
     @Override
     public boolean update(Nguoi t) {
-        String sql = "UPDATE khachHang SET name = ?,age = ?, numberPhone=?, email=?, status=? WHERE id = ?";
+        String sql = "UPDATE khachHang SET name = ?,age = ?, numberPhone=?, email=? WHERE id = ?";
 
         try (Connection conn = duLieu.ket_noi();
              PreparedStatement ptm = conn.prepareStatement(sql)) {                
@@ -108,8 +113,7 @@ public class DAOKhachHang implements DAOInterFace<Nguoi> {
                 ptm.setInt(2, t.getAge()); 
                 ptm.setString(3, t.getNumberPhone());
                 ptm.setString(4, t.getEmail());
-                ptm.setString(5,t.getStatus());
-                ptm.setInt(6, t.getId());
+                ptm.setInt(5, t.getId());
             
                 return ptm.executeUpdate()>0 ? true : false;
     
@@ -181,6 +185,72 @@ public class DAOKhachHang implements DAOInterFace<Nguoi> {
             duLieu.close();
         }
         
+    }
+    public ArrayList<SanPham>dsSanPhamDaMua(int id){
+        ArrayList<SanPham> ds = new ArrayList<>();
+        String sql = "SELECT " +
+        "sanPham.name, " +
+        "sanPham.price, " +
+        "SUM(ChiTietHoaDon.soLuong) AS total_quantity, " +
+        "SUM(ChiTietHoaDon.soLuong * sanPham.price) AS total " +
+        "FROM khachHang " +
+        "JOIN HoaDon ON HoaDon.id_khachHang = khachHang.id " +
+        "JOIN ChiTietHoaDon ON ChiTietHoaDon.id_HD = HoaDon.id " +
+        "JOIN sanPham ON sanPham.id = ChiTietHoaDon.id_SP " +
+        "WHERE khachHang.id = ? " +
+        "GROUP BY sanPham.name, sanPham.price";
+        try (Connection con = duLieu.ket_noi()){
+            PreparedStatement ptm = con.prepareStatement(sql);
+            ptm.setInt(1, id);
+            ResultSet rs = ptm.executeQuery();
+            while (rs.next()) {
+                SanPham sp = new SanPham();
+                sp.setName(rs.getString("name"));
+                sp.setTongSL(rs.getInt("total_quantity"));
+                sp.setPrice(rs.getInt("price"));
+                sp.setTongGia(rs.getInt("total"));
+                ds.add(sp);      
+            }
+            return ds;
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return null;
+            
+        }
+    }
+    public ArrayList<Ve> danhSachVeDaDat(int id){
+                ArrayList<Ve> ds = new ArrayList<>();
+        String sql = "SELECT Ve.id, Ve.user_id, Ve.seat_id, Ve.showTime_id, Ve.status , Ve.price ,LichChieu.room_id, LichChieu.movie_id, Phim.name AS nameMovie, LichChieu.time AS timeChieu,LichChieu.date AS dayChieu,Seat.name AS nameNumber, khachHang.name AS nameUser, khachHang.numberPhone AS numUser, PhongChieu.name AS roomName " +
+        "FROM Ve " +
+        "LEFT JOIN khachHang  ON khachHang.id = Ve.user_id " +
+        "LEFT JOIN LichChieu ON LichChieu.id = Ve.showTime_id " +
+        "LEFT JOIN PhongChieu ON PhongChieu.id = LichChieu.room_id " +
+        "LEFT JOIN Phim ON Phim.id = LichChieu.movie_id " +
+        "LEFT JOIN Seat ON Seat.id = Ve.seat_id " +
+        "WHERE khachHang.id = ? ";
+        try(Connection conn = duLieu.ket_noi()) {
+        PreparedStatement ptm = conn.prepareStatement(sql);
+        ptm.setInt(1, id);
+        ResultSet rs = ptm.executeQuery();
+            while(rs.next()){
+                Ve v= new Ve( rs.getInt("id"),rs.getInt("price") );
+                v.setNameSeat(rs.getString("nameNumber"));
+                v.setNameUser(rs.getString("nameUser"));
+                v.setNameRoom(rs.getString("roomName"));
+                v.setSeat_id(rs.getInt("seat_id"));
+                v.setShowTime_id(rs.getInt("showTime_id"));
+                v.setUser_id(rs.getInt("user_id"));
+                v.setTime(rs.getObject("timeChieu",LocalTime.class));
+                v.setDay(rs.getObject("dayChieu",LocalDate.class));
+                v.setNameMovie(rs.getString("nameMovie"));
+                v.setStatus(rs.getString("status"));
+                ds.add(v);
+            }
+            return ds;
+    }catch(Exception e){
+        e.printStackTrace();
+        return null;
+    }
     }
     
 }

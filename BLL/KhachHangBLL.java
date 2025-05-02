@@ -4,12 +4,14 @@ import java.util.ArrayList;
 
 import DAO.DAOKhachHang;
 import DTO.Nguoi;
+import DTO.SanPham;
+import DTO.Ve;
 
 public class KhachHangBLL {
     DAOKhachHang d = new DAOKhachHang();
 
 
-   public ArrayList<Nguoi> geArrayList(){
+   public ArrayList<Nguoi> getArrayList(){
         return d.selectAll();
     }
 
@@ -27,5 +29,10 @@ public class KhachHangBLL {
     public ArrayList<Nguoi> searchName(String condition){
         return d.selectCondition(condition);
     }
-
+    public ArrayList<SanPham>dsSanPhamDaMua(int id){
+        return d.dsSanPhamDaMua(id);
+    }
+    public ArrayList<Ve>dsVeDaDat(int id){
+        return d.danhSachVeDaDat(id);
+    }
 }

@@ -31,18 +31,17 @@ public class DAONhanVien implements DAOInterFace<NhanVien> {
 
     @Override
     public boolean insert(NhanVien t) {
-         String sql = "INSERT INTO NhanVien (id,name,age,numberPhone,email,status,position) VALUES (?,?,?,?,?,?,?)";
+         String sql = "INSERT INTO NhanVien (name,age,numberPhone,email,status,position) VALUES (?,?,?,?,?,?)";
         try(Connection conn = duLieu.ket_noi()) {
             PreparedStatement ptm = conn.prepareStatement(sql);
-            ptm.setInt(1,t.getId());
-            ptm.setString(2, t.getName());
-            ptm.setInt(3, t.getAge());
-            ptm.setString(4,t.getNumberPhone());
-            ptm.setString(5, t.getEmail());
-            ptm.setString(6, t.getStatus());
-            ptm.setString(7, t.getPosition());
+            ptm.setString(1, t.getName());
+            ptm.setInt(2, t.getAge());
+            ptm.setString(3,t.getNumberPhone());
+            ptm.setString(4, t.getEmail());
+            ptm.setString(5, t.getStatus());
+            ptm.setString(6, t.getPosition());
             int row = ptm.executeUpdate();
-            return row>0?true:false;
+            return row>0? true : false;
 
         } catch (Exception e) {
            return false;
@@ -59,7 +58,7 @@ public class DAONhanVien implements DAOInterFace<NhanVien> {
             cal.setInt(1, t.getId()); 
             cal.registerOutParameter(2, java.sql.Types.NVARCHAR);
             cal.execute();
-            return cal.getString(2).equalsIgnoreCase("Xóa thành công")? true : false;
+            return cal.getString(2).equalsIgnoreCase("xóa thành công")? true : false;
             
         } catch (SQLException e) {
             e.printStackTrace();
@@ -72,7 +71,7 @@ public class DAONhanVien implements DAOInterFace<NhanVien> {
 
     @Override
     public boolean update(NhanVien t) {
-        String sql = "UPDATE NhanVien SET name = ?,age = ?, numberPhone=?, email=?, status=?, position = ? WHERE id = ?";
+        String sql = "UPDATE NhanVien SET name = ?,age = ?, numberPhone=?, email=?, position = ? WHERE id = ?";
 
         try (Connection conn = duLieu.ket_noi();
              PreparedStatement ptm = conn.prepareStatement(sql)) {                
@@ -80,9 +79,8 @@ public class DAONhanVien implements DAOInterFace<NhanVien> {
                 ptm.setInt(2, t.getAge()); 
                 ptm.setString(3, t.getNumberPhone());
                 ptm.setString(4, t.getEmail());
-                ptm.setString(5,t.getStatus());
-                ptm.setString(6, t.getPosition());
-                ptm.setInt(7, t.getId());
+                ptm.setString(5, t.getPosition());
+                ptm.setInt(6, t.getId());
             
                 return ptm.executeUpdate()>0 ? true : false;
     
@@ -127,7 +125,7 @@ public class DAONhanVien implements DAOInterFace<NhanVien> {
     @Override
     public ArrayList<NhanVien> selectCondition(String condition) {
         ArrayList<NhanVien> ds = new ArrayList<>();
-        String sql = "SELECT * FROM NhanVien WHERE name LIKE ?";
+        String sql = "SELECT * FROM NhanVien WHERE name LIKE ? AND status = 'T' ";
         try(Connection con = duLieu.ket_noi()) {
             PreparedStatement ptm = con.prepareStatement(sql);
             ptm.setString(1,"%"+condition+"%");

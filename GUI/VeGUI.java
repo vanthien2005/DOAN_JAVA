@@ -43,7 +43,12 @@ public class VeGUI {
         search.setFocusPainted(false); // Bỏ viền focus
         search.setContentAreaFilled(false); // Nền trong suốt (tuỳ chọn)
         search.setBorderPainted(false); // Không viền (tuỳ chọn)
-        DefaultTableModel model = new DefaultTableModel();
+        DefaultTableModel model = new DefaultTableModel() {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false; // Không ô nào được sửa
+            }
+        };
         model.addColumn("ID");
         model.addColumn("Khách hàng");
         model.addColumn("Phim");
@@ -70,11 +75,7 @@ public class VeGUI {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String condition = (String) comTrangThai.getSelectedItem();
-                System.out.println("Condition raw: [" + condition + "]");
-                System.out.println("Length: " + condition.length());
-                for (char c : condition.toCharArray()) {
-                    System.out.print((int)c + " ");
-                }
+                condition.trim();
                 if(condition.equals("Tất cả")){
                     showVe(maiPanel);
                 }
@@ -121,7 +122,12 @@ public class VeGUI {
         search.setFocusPainted(false); // Bỏ viền focus
         search.setContentAreaFilled(false); // Nền trong suốt (tuỳ chọn)
         search.setBorderPainted(false); // Không viền (tuỳ chọn)
-        DefaultTableModel model = new DefaultTableModel();
+        DefaultTableModel model = new DefaultTableModel() {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false; // Không ô nào được sửa
+            }
+        };
         model.addColumn("ID");
         model.addColumn("Khách hàng");
         model.addColumn("Phim");
@@ -187,7 +193,7 @@ public class VeGUI {
     public void formThemVe( View v){
 
         JDialog addDialog = new JDialog(v, "Thêm vé mới", true);
-        addDialog.setSize(500, 400);
+        addDialog.setSize(400, 300);
         addDialog.setLocationRelativeTo(v);
         
         // ==== THÔNG TIN KHÁCH HÀNG ====
@@ -199,10 +205,11 @@ public class VeGUI {
         thongTinKH.add(tenKhach);
         thongTinKH.add(new JLabel("Số điện thoại:"));
         thongTinKH.add(sdt);
+        thongTinKH.setBorder(BorderFactory.createEmptyBorder(10, 0, 20, 0));
         
         // === Chọn phim, lịch chiếu, ghế ===
         JPanel luaChon = new JPanel();
-        luaChon.setLayout(new BoxLayout(luaChon, BoxLayout.Y_AXIS));
+        luaChon.setLayout(new GridLayout(0,2,10,10));
         luaChon.setBorder(BorderFactory.createTitledBorder("Thông tin vé"));
         JComboBox<String> phim = new JComboBox<>();
         phim.setPreferredSize(new Dimension(150, 25));
@@ -256,27 +263,21 @@ public class VeGUI {
             }
         });
                 
-        JPanel row1 = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        row1.add(new JLabel("Chọn phim:"));
-        phim.setPreferredSize(new Dimension(180, 25));
-        row1.add(phim);
 
-        JPanel row2 = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        row2.add(new JLabel("Chọn lịch chiếu:"));
-        lichChieu.setPreferredSize(new Dimension(180, 25));
-        row2.add(lichChieu);
+        luaChon.add(new JLabel("Chọn phim:"));
+        luaChon.add(phim);
 
-        JPanel row3 = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        row3.add(new JLabel("Chọn ghế:"));
-        ghe.setPreferredSize(new Dimension(180, 25));
-        row3.add(ghe);
+        luaChon.add(new JLabel("Chọn lịch chiếu:"));
+        luaChon.add(lichChieu);
+
+        luaChon.add(new JLabel("Chọn ghế:"));
+        luaChon.add(ghe);
         
-        luaChon.add(row1);
-        luaChon.add(row2);
-        luaChon.add(row3);
+
                         
         // === Nút lưu & hủy ===
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 0));
+        buttonPanel.setBorder(BorderFactory.createEmptyBorder(30, 0, 0, 0));
         JButton btnLuu = new JButton("Lưu");
         JButton btnHuy = new JButton("Hủy");
         buttonPanel.add(btnLuu);
